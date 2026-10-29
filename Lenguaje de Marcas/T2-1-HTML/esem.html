@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="autor" content="Agustin" lang="UTF-8">
+  
+  <meta name="descripcion" content="Mi pelicula favorita">
+  <meta name="fecha" content="14/10/2026">
+  <title>Primera Pagina WEB</title>
+</head>
+  <style>
+  * {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+  background-color: #666;
+  padding: 30px;
+  text-align: center;
+  font-size: 35px;
+  color: white;
+}
+
+
+nav {
+  float: left;
+  width: 30%;
+  height: 300px; 
+  background: #ccc;
+  padding: 20px;
+}
+
+/* Style the list inside the menu */
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+article {
+  float: left;
+  padding: 20px;
+  width: 70%;
+  background-color: #f1f1f1;
+  height: 300px; 
+}
+
+
+section::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+footer {
+  background-color: #777;
+  padding: 10px;
+  text-align: center;
+  color: white;
+}
+  </style>
+<body>
+  <header>
+    <h1>Agustin's Page</h1>
+    
+  </header>
+  <section>
+    <nav>
+      <ul>
+        <li><a href="#Imagenes">Imagenes</a></li>
+        <li><a href="#PP">Personajes Principales</a></li>
+        <li><a href="#Trailer">Trailer</a></li>
+      </ul>
+    </nav>
+    <article>
+    <strong>Silent Hill </strong> <i>2006</i>
+    <p>Rose es una joven madre que trata de encontrar curación para su hija enferma. Incapaz de resignarse al diagnóstico de los médicos que proponen internarla de forma permanente en un centro psiquiátrico, Rose huye con su hija hasta llegar a una ciudad aparentemente desértica.</p>
+    <mark>Director: Christophe Gans</mark>
+  </article>
+  </section>
+  
+  <h2 i>Nominaciones</h2>
+  <ul>
+    <li>Premios Saturn 2007</li>
+    <li>Premios Genie 2007</li>
+  </ul>
+  <img src="https://m.media-amazon.com/images/M/MV5BYTczZmZlZmEtODU4ZS00YzgzLThiMDUtMGE0ZmJhYzdhZGY5XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Se deberia de ver una imagen aqui" width="300"><br>
+  <a href="https://en.wikipedia.org/wiki/Silent_Hill_(film)">Silent Hill en Wikipedia</a><br>
+  <a href="https://en.wikipedia.org/wiki/Saturn_Awards">Premios Saturn</a>
+  <div>
+    <a href="#Skill">Nominaciones</a><br>
+    <a href="https://google.com">Google.com</a>
+  </div>
+  <div>
+    <img id="Imagenes" src="https://i.blogs.es/86527c/screenshot_3007/1366_2000.jpeg" alt="Silent Hill 1" width="350" height="250"><br>
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTy-kt93TeyaDU4XA1sUtzgN0zy5NnPIxmIoZ7iyKstVp3Vp7rZ1XEHBHLf&s=10" alt="Silent Hill 2" width="400" height="200">
+  </div>
+  <div>
+    <table border="1" id="PP">
+    <thead>
+      <tbody>
+        <tr>
+          <td>Rose Da Silva</td>
+          <th>Cybil Bennett</th>
+          <td>Christopher Da Silva</td>
+        </tr>
+        <tr>
+          <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRcmr2O-ld05lkWl2HENMb6GGkVAkcjsp28HDZIXhYNA&s=10" alt="Rose"></td>
+          <td><img src="https://static.wikia.nocookie.net/silent/images/0/0c/CybilB.png/revision/latest?cb=20150115023044" alt="Cybil" width="300"></td>
+          <td><img src="https://static.wikia.nocookie.net/silent/images/0/05/Christopher_Da_Silva_%28rE%29.jpg/revision/latest?cb=20221023130124" alt="Christopher" width="300"></td>
+        </tr>
+      </tbody>
+    </thead>
+   </table>
+   <br>
+   <div>
+    <iframe id="Trailer" width="560" height="315" src="https://www.youtube.com/embed/1mfnhu8sO5k" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+   </div>
+  </div>
+  <footer>
+  <p>Hecho por Agustin</p>
+</footer>
+</body>
+</html>
