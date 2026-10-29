@@ -1,0 +1,215 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="er-hotel" name="ER Hotel">
+    <mxGraphModel dx="1000" dy="500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="950" pageHeight="450" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ================= ENTIDADES ================= -->
+        <mxCell id="ent_hotel" value="HOTEL" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="370" y="138" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ent_cat" value="CATEGORY" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="623" y="136" width="110" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ent_room" value="ROOM" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="370" y="272" width="110" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ent_agency" value="TRAVEL AGENCY" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="272" width="110" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ent_ind" value="INDIVIDUAL" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="660" y="272" width="125" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ================= RELACIONES ================= -->
+        <mxCell id="rel_class" value="ClassifiedIn" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="506" y="136" width="92" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_has" value="Has" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="382" y="205" width="86" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_reserve" value="Reserve" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="225" y="271" width="95" height="57" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_resby" value="ReservedBy" style="rhombus;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="522" y="271" width="98" height="57" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ATRIBUTOS HOTEL ================= -->
+        <mxCell id="at_h_addr" value="Adress" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="288" y="35" width="78" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="at_h_tel" value="TelephoneNumber" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="380" y="3" width="98" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="at_h_year" value="YearOfConstruction" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="478" y="35" width="106" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="at_h_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="282" y="100" width="76" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="at_h_id" value="HotelID" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="284" y="145" width="72" height="32" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ATRIBUTOS CATEGORY ================= -->
+        <mxCell id="at_c_vat" value="VATRate" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="598" y="35" width="72" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="at_c_desc" value="Description" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="678" y="35" width="88" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="at_c_id" value="CategoryID" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="735" y="98" width="90" height="32" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ATRIBUTOS TRAVEL AGENCY ================= -->
+        <mxCell id="at_a_id" value="AgencyID" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="25" y="342" width="78" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="at_a_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="112" y="342" width="70" height="32" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ATRIBUTOS ROOM ================= -->
+        <mxCell id="at_r_code" value="Code" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="342" y="342" width="74" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="at_r_type" value="Type" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="432" y="342" width="74" height="32" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ATRIBUTOS INDIVIDUAL ================= -->
+        <mxCell id="at_i_id" value="IndividualID" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="795" y="222" width="95" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="at_i_tel" value="TelephoneNumber" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="800" y="318" width="112" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="at_i_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="650" y="345" width="72" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="at_i_addr" value="Adress" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="735" y="348" width="74" height="32" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ATRIBUTOS RESERVE ================= -->
+        <mxCell id="at_rv_price" value="Price" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="195" y="312" width="58" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="at_rv_end" value="EndDate" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="292" y="312" width="62" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="at_rv_person" value="PersonName" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="188" y="346" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="at_rv_start" value="StartDate" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="275" y="346" width="66" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ATRIBUTOS RESERVEDBY ================= -->
+        <mxCell id="at_rb_price" value="Price" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="503" y="324" width="60" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="at_rb_end" value="EndDate" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="580" y="324" width="64" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="at_rb_start" value="StartDate" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="540" y="352" width="68" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ================= LÍNEAS ENTIDAD-RELACIÓN ================= -->
+        <mxCell id="e_hotel_class" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="ent_hotel" target="rel_class">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_class_cat" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="rel_class" target="ent_cat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_hotel_has" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="ent_hotel" target="rel_has">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_has_room" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="rel_has" target="ent_room">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_agency_reserve" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="ent_agency" target="rel_reserve">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_reserve_room" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="rel_reserve" target="ent_room">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_room_resby" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="ent_room" target="rel_resby">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_resby_ind" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="rel_resby" target="ent_ind">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================= LÍNEAS ATRIBUTOS ================= -->
+        <mxCell id="l1" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_h_addr" target="ent_hotel"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l2" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_h_tel" target="ent_hotel"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l3" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_h_year" target="ent_hotel"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l4" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_h_name" target="ent_hotel"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l5" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_h_id" target="ent_hotel"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l6" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_c_vat" target="ent_cat"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l7" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_c_desc" target="ent_cat"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l8" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_c_id" target="ent_cat"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l9" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_a_id" target="ent_agency"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l10" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_a_name" target="ent_agency"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l11" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_r_code" target="ent_room"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l12" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_r_type" target="ent_room"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l13" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_i_id" target="ent_ind"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l14" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_i_tel" target="ent_ind"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l15" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_i_name" target="ent_ind"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l16" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_i_addr" target="ent_ind"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l17" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_rv_price" target="rel_reserve"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l18" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_rv_end" target="rel_reserve"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l19" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_rv_person" target="rel_reserve"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l20" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_rv_start" target="rel_reserve"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l21" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_rb_price" target="rel_resby"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l22" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_rb_end" target="rel_resby"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="l23" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="at_rb_start" target="rel_resby"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ================= TIPOS DE RELACIÓN ================= -->
+        <mxCell id="t_n1" value="N:1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="537" y="118" width="30" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="t_1n" value="1:N" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="470" y="212" width="30" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="t_nm1" value="N:M" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="257" y="252" width="32" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="t_nm2" value="N:M" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="555" y="252" width="32" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- ================= CARDINALIDADES ================= -->
+        <mxCell id="c1" value="(1,N)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="478" y="146" width="32" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="(1,1)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="594" y="146" width="32" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="(1,1)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="427" y="189" width="32" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="(1,N)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="427" y="255" width="32" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="(1,N)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="170" y="282" width="32" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" value="(1,N)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="336" y="282" width="32" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" value="(1,N)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="483" y="282" width="32" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" value="(1,N)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="625" y="282" width="32" height="14" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
