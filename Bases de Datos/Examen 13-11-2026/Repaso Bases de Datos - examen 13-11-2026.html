@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Repaso ER y relacional</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: columna de lectura de 46rem; el mapa se abre a 72rem con 3 ramas numeradas (tema 1 → 2 → 3) y una barra para el tema 4; en móvil todo va en una columna */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#17202b; --muted:#566275; --line:#d5dbe3; --line-strong:#aab4c2;
+  --er:#0b7a68; --er-soft:#e2f2ee; --er-line:#9dd2c7;
+  --map:#a45a07; --map-soft:#fbefdf; --map-line:#e8bf86; --on-map:#ffffff;
+  --rel:#2a55c9; --rel-soft:#e7edfb; --rel-line:#a9bcef;
+  --warn:#b3261e; --warn-soft:#fcecea; --warn-line:#efb3ad;
+  --code:#eef1f5;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1319; --surface:#161d26; --ink:#e4e9f0; --muted:#9aa6b6; --line:#28323f; --line-strong:#465365;
+    --er:#4cc9b2; --er-soft:#113029; --er-line:#2b6b5f;
+    --map:#f2aa52; --map-soft:#33240e; --map-line:#7a5420; --on-map:#1b1206;
+    --rel:#8ba5ff; --rel-soft:#18233f; --rel-line:#3a4f8f;
+    --warn:#ff8f82; --warn-soft:#3a1613; --warn-line:#7d3029;
+    --code:#1c242f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1319; --surface:#161d26; --ink:#e4e9f0; --muted:#9aa6b6; --line:#28323f; --line-strong:#465365;
+  --er:#4cc9b2; --er-soft:#113029; --er-line:#2b6b5f;
+  --map:#f2aa52; --map-soft:#33240e; --map-line:#7a5420; --on-map:#1b1206;
+  --rel:#8ba5ff; --rel-soft:#18233f; --rel-line:#3a4f8f;
+  --warn:#ff8f82; --warn-soft:#3a1613; --warn-line:#7d3029;
+  --code:#1c242f;
+  color-scheme:dark;
+}
+@media (prefers-reduced-motion: no-preference){ html{ scroll-behavior:smooth } }
+
+body{
+  background:var(--bg); color:var(--ink); margin:0;
+  font-family:var(--f-body); font-size:1.0625rem; line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:0 48px;
+}
+body::before{ content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:10; background:var(--bg); }
+[id]{ scroll-margin-top:calc(64px + env(safe-area-inset-top, 0px)); }
+a{ color:inherit; }
+a:focus-visible, summary:focus-visible{ outline:3px solid var(--rel); outline-offset:2px; border-radius:6px; }
+
+h1,h2,h3,h4{ font-family:var(--f-display); line-height:1.15; text-wrap:balance; margin:0; }
+h1{ font-size:clamp(2rem, 1.4rem + 3vw, 3.1rem); font-weight:800; letter-spacing:-.02em; }
+h2{ font-size:clamp(1.6rem, 1.3rem + 1.3vw, 2.1rem); font-weight:800; letter-spacing:-.01em; }
+h3{ font-size:1.3rem; font-weight:600; }
+h4{ font-size:1.05rem; font-weight:600; }
+p{ margin:0; }
+ul,ol{ margin:0; }
+code{ font-family:var(--f-mono); font-size:.88em; background:var(--code); padding:1px 5px; border-radius:4px; }
+.eyebrow{ font-size:.78rem; text-transform:uppercase; letter-spacing:.09em; font-weight:700; color:var(--muted); }
+.en{ font-style:italic; color:var(--muted); font-size:.9em; font-weight:400; }
+.muted{ color:var(--muted); }
+.small{ font-size:.92rem; }
+
+.wrap{ max-width:46rem; margin-inline:auto; }
+.wide{ max-width:72rem; margin-inline:auto; }
+
+/* ---------- menú ---------- */
+.topnav{ position:sticky; top:env(safe-area-inset-top, 0px); z-index:5; background:var(--bg); border-bottom:1px solid var(--line);
+  margin-left:calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right:calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+.topnav-in{ max-width:72rem; margin-inline:auto; display:flex; gap:4px; overflow-x:auto; padding-block:8px; scrollbar-width:none; }
+.topnav-in::-webkit-scrollbar{ display:none; }
+.topnav a{ flex:none; text-decoration:none; font-size:.92rem; font-weight:700; padding:6px 11px; border-radius:999px; color:var(--muted); }
+.topnav a:hover{ background:var(--surface); color:var(--ink); }
+.topnav a b{ font-family:var(--f-mono); margin-right:5px; }
+.nv-er b{ color:var(--er); } .nv-rl b{ color:var(--rel); } .nv-mp b{ color:var(--map); } .nv-fn b{ color:var(--ink); }
+
+/* ---------- cabecera ---------- */
+.hero{ padding-block:36px 8px; display:flex; flex-direction:column; gap:14px; }
+.hero .lead{ font-size:1.12rem; max-width:40rem; }
+.howto{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap:8px; padding:0; margin:0; list-style:none; counter-reset:paso; }
+.howto li{ counter-increment:paso; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:10px 12px; display:flex; gap:10px; font-size:.95rem; line-height:1.4; }
+.howto li::before{ content:counter(paso); flex:none; width:24px; height:24px; border-radius:50%; background:var(--ink); color:var(--bg); display:grid; place-items:center; font-family:var(--f-mono); font-size:.85rem; font-weight:600; }
+.sources{ font-size:.85rem; color:var(--muted); }
+.sources b{ font-family:var(--f-mono); font-weight:400; font-size:.92em; }
+
+/* ---------- mapa mental ---------- */
+.map-sec{ padding-block:32px 8px; display:flex; flex-direction:column; gap:18px; }
+.map-sec > .intro{ display:flex; flex-direction:column; gap:8px; }
+.map{ --gap:44px; display:flex; flex-direction:column; align-items:center; }
+.map-root{ background:var(--ink); color:var(--bg); border-radius:12px; padding:12px 20px; text-align:center; display:flex; flex-direction:column; gap:2px; max-width:100%; }
+.map-root .eyebrow{ color:inherit; opacity:.75; }
+.map-root strong{ font-family:var(--f-display); font-size:1.3rem; font-weight:800; }
+.map-branches{ position:relative; width:100%; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--gap); padding-top:30px; }
+.map-branches::after{ content:""; position:absolute; top:0; left:50%; height:15px; border-left:2px solid var(--line-strong); }
+.map-branches::before{ content:""; position:absolute; top:15px; left:calc((100% - 2 * var(--gap)) / 6); right:calc((100% - 2 * var(--gap)) / 6); border-top:2px solid var(--line-strong); }
+.branch{ position:relative; background:var(--surface); border:1px solid var(--line); border-radius:12px; display:flex; flex-direction:column; min-width:0; }
+.branch::before{ content:""; position:absolute; top:-16px; left:50%; height:15px; border-left:2px solid var(--line-strong); }
+.branch:not(:last-child)::after{ content:"→"; position:absolute; top:24px; right:calc(-1 * var(--gap)); width:var(--gap); text-align:center; font-size:1.5rem; font-weight:800; color:var(--line-strong); line-height:1; }
+.er{ --c:var(--er); --c-soft:var(--er-soft); --c-line:var(--er-line); }
+.rl{ --c:var(--rel); --c-soft:var(--rel-soft); --c-line:var(--rel-line); }
+.mp{ --c:var(--map); --c-soft:var(--map-soft); --c-line:var(--map-line); }
+.fn{ --c:var(--ink); --c-soft:var(--surface); --c-line:var(--line-strong); }
+.branch-head{ display:flex; gap:12px; align-items:center; padding:12px 16px; background:var(--c-soft); border-bottom:1px solid var(--c-line); border-radius:12px 12px 0 0; text-decoration:none; color:var(--c); }
+.branch-head .bn{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--c); color:var(--surface); display:grid; place-items:center; font-family:var(--f-display); font-weight:800; font-size:1.2rem; }
+.branch-head .bt{ display:flex; flex-direction:column; min-width:0; }
+.branch-head .k{ font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; }
+.branch-head .t{ font-family:var(--f-display); font-size:1.3rem; font-weight:800; line-height:1.15; }
+.leaves{ list-style:none; position:relative; padding:10px 12px 12px 30px; display:flex; flex-direction:column; gap:1px; }
+.leaves::before{ content:""; position:absolute; left:17px; top:4px; bottom:30px; border-left:2px solid var(--c-line); }
+.leaves li{ position:relative; }
+.leaves li::before{ content:""; position:absolute; left:-13px; top:18px; width:12px; border-top:2px solid var(--c-line); }
+.leaves a{ display:grid; grid-template-columns:2.4rem minmax(0,1fr); gap:6px; padding:5px 8px; border-radius:8px; text-decoration:none; }
+.leaves a:hover{ background:var(--c-soft); }
+.leaves .ln-n{ font-family:var(--f-mono); font-size:.82rem; font-weight:600; color:var(--c); padding-top:2px; }
+.leaves .ln-t{ display:flex; flex-direction:column; min-width:0; }
+.leaves b{ font-size:.97rem; }
+.leaves small{ font-size:.84rem; color:var(--muted); line-height:1.35; }
+.map-final{ margin-top:18px; width:100%; display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; background:var(--surface); border:1.5px dashed var(--line-strong); border-radius:12px; padding:10px 14px; }
+.map-final .bn{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--ink); color:var(--bg); display:grid; place-items:center; font-family:var(--f-display); font-weight:800; }
+.map-final .t{ font-family:var(--f-display); font-weight:800; font-size:1.1rem; margin-right:4px; }
+.map-final a{ text-decoration:none; font-weight:700; font-size:.92rem; padding:4px 10px; border-radius:999px; background:var(--code); }
+.map-final a span{ font-family:var(--f-mono); color:var(--muted); margin-right:4px; font-weight:600; }
+
+.conn{ display:flex; flex-direction:column; gap:10px; }
+.conn-head{ font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--muted); }
+.conn-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap:8px 28px; }
+.conn-row{ display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:8px; }
+.pill{ padding:6px 10px; border-radius:8px; font-size:.92rem; line-height:1.3; border:1px solid; }
+.pill.er{ background:var(--er-soft); border-color:var(--er-line); }
+.pill.rl{ background:var(--rel-soft); border-color:var(--rel-line); }
+.conn .arrow{ color:var(--map); font-weight:800; }
+
+@media (max-width: 860px){
+  .map-branches{ grid-template-columns:minmax(0,1fr); gap:44px; padding-top:20px; }
+  .map-branches::before{ display:none; }
+  .map-branches::after{ height:20px; }
+  .branch::before{ display:none; }
+  .branch:not(:last-child)::after{ content:"↓"; top:auto; bottom:-38px; right:0; left:0; width:auto; }
+}
+
+/* ---------- temas ---------- */
+.topic{ padding-block:64px 0; }
+.topic-head{ display:flex; gap:14px; align-items:center; padding-bottom:16px; border-bottom:3px solid var(--c); }
+.topic-head .bn{ flex:none; width:48px; height:48px; border-radius:50%; background:var(--c); color:var(--surface); display:grid; place-items:center; font-family:var(--f-display); font-weight:800; font-size:1.6rem; }
+.fn .topic-head .bn{ background:var(--ink); color:var(--bg); }
+.topic-head > div{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.topic-head .eyebrow{ color:var(--c); }
+.src{ font-size:.8rem; color:var(--muted); font-family:var(--f-mono); }
+.esencial{ margin-top:20px; background:var(--c-soft); border:1px solid var(--c-line); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+.esencial > strong{ font-family:var(--f-display); font-size:.85rem; text-transform:uppercase; letter-spacing:.09em; color:var(--c); }
+.esencial ul{ padding-left:1.2em; display:flex; flex-direction:column; gap:5px; }
+.esencial li::marker{ color:var(--c); }
+.sub{ padding-top:40px; display:flex; flex-direction:column; gap:14px; }
+.sub > *{ min-width:0; }
+.sub-head{ display:flex; flex-direction:column; gap:2px; }
+.sub-head h3{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+.sub-head h3 .n{ font-family:var(--f-mono); font-size:.9rem; color:var(--c); font-weight:600; }
+.idea{ font-size:1.08rem; font-weight:700; }
+ul.clean, ol.clean{ padding-left:1.25em; display:flex; flex-direction:column; gap:6px; }
+ul.clean li::marker, ol.clean li::marker{ color:var(--c); font-weight:700; }
+
+.grid2{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap:10px; }
+.card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:4px; min-width:0; }
+.card h4{ color:var(--c); }
+.card p{ font-size:.97rem; }
+
+.tip{ background:var(--c-soft); border:1px solid var(--c-line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; }
+.tip > strong:first-child, .ojo > strong:first-child{ font-family:var(--f-display); font-size:.82rem; text-transform:uppercase; letter-spacing:.09em; }
+.tip > strong:first-child{ color:var(--c); }
+.ojo{ background:var(--warn-soft); border:1px solid var(--warn-line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; }
+.ojo > strong:first-child{ color:var(--warn); }
+.ojo ul{ padding-left:1.2em; display:flex; flex-direction:column; gap:4px; }
+
+.fig{ margin:0; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 14px 10px; display:flex; flex-direction:column; gap:8px; min-width:0; }
+.fig figcaption{ font-size:.9rem; color:var(--muted); line-height:1.45; }
+.fig-scroll{ overflow-x:auto; }
+.fig-scroll svg{ min-width:600px; }
+
+svg.chen{ display:block; width:100%; max-width:30rem; height:auto; color:var(--ink); font-family:var(--f-body); }
+svg.chen.big{ max-width:none; }
+.chen .ent, .chen .rel, .chen .att, .chen .tri{ fill:var(--surface); stroke:currentColor; stroke-width:1.5; }
+.chen .ln{ stroke:currentColor; stroke-width:1.5; fill:none; }
+.chen text{ fill:currentColor; text-anchor:middle; font-size:14px; }
+.chen .ent-t{ font-weight:700; letter-spacing:.02em; font-size:13.5px; }
+.chen .rel-t{ font-size:12.5px; }
+.chen .att-t{ font-size:12.5px; }
+.chen .pk{ text-decoration:underline; }
+.chen .card-t{ fill:var(--c, var(--er)); font-family:var(--f-mono); font-size:12.5px; font-weight:600; text-anchor:start; }
+.chen .card-t.end{ text-anchor:end; }
+.chen .top-t{ font-size:12px; font-weight:700; fill:var(--muted); }
+.chen .role-t{ font-size:12px; font-style:italic; fill:var(--muted); }
+.chen .set{ fill:var(--c-soft, var(--er-soft)); stroke:var(--c, var(--er)); stroke-width:1.5; }
+.chen .set-t{ font-size:13px; font-weight:700; }
+
+.cardrows{ display:flex; flex-direction:column; gap:10px; }
+.cardrow{ display:grid; grid-template-columns:120px minmax(0,1fr); gap:16px; align-items:start; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px; }
+.cardrow .sets svg{ width:120px; }
+.cardrow .body{ display:flex; flex-direction:column; gap:8px; min-width:0; }
+.cardrow h4{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+.cardrow h4 .tag{ font-family:var(--f-mono); color:var(--c); font-size:1rem; }
+.cardrow .pizza{ font-size:.9rem; color:var(--muted); }
+@media (max-width: 560px){
+  .cardrow{ grid-template-columns:minmax(0,1fr); }
+  .cardrow .sets svg{ width:110px; }
+}
+
+.tscroll{ overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+table{ border-collapse:collapse; width:100%; font-size:.93rem; }
+caption{ caption-side:top; text-align:left; padding:10px 12px 0; font-size:.85rem; color:var(--muted); font-weight:700; }
+th, td{ text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+thead th{ font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+tbody tr:last-child td, tbody tr:last-child th{ border-bottom:0; }
+.data td, .data th{ white-space:nowrap; font-variant-numeric:tabular-nums; }
+.data .null{ color:var(--warn); font-family:var(--f-mono); font-size:.88em; }
+.data th .fkcol{ display:block; text-transform:none; letter-spacing:0; color:var(--map); font-weight:700; font-size:.78rem; }
+.data th .pkcol{ display:block; text-transform:none; letter-spacing:0; color:var(--rel); font-weight:700; font-size:.78rem; }
+.sym-table td:first-child{ font-family:var(--f-mono); color:var(--c); white-space:nowrap; }
+.sum{ min-width:560px; }
+.sum th[scope="row"]{ font-family:var(--f-display); font-weight:600; white-space:nowrap; }
+.sum td.cc{ font-family:var(--f-mono); white-space:nowrap; color:var(--map); font-weight:600; }
+.sum .grp td, .sum .grp th{ border-top:2px solid var(--line-strong); }
+.sum .warnline{ display:block; color:var(--warn); font-size:.85rem; margin-top:4px; }
+svg.cf{ width:120px; height:30px; color:var(--ink); display:block; }
+.cf line, .cf polyline{ stroke:currentColor; stroke-width:2; fill:none; }
+.cf circle{ stroke:currentColor; stroke-width:2; fill:var(--surface); }
+
+.schema{ font-family:var(--f-mono); font-size:.86rem; line-height:1.7; background:var(--code); border-radius:8px; padding:12px 14px; white-space:pre-wrap; overflow-wrap:anywhere; margin:0; }
+.schema .t{ color:var(--rel); font-weight:600; }
+.schema u{ text-decoration-thickness:2px; text-underline-offset:3px; font-weight:600; }
+.schema .fk{ color:var(--map); font-weight:600; }
+.schema .k{ color:var(--muted); }
+.schema .c{ color:var(--warn); font-weight:600; }
+.schema-legend{ display:flex; flex-wrap:wrap; gap:6px 16px; font-size:.88rem; color:var(--muted); }
+.opt{ display:flex; flex-direction:column; gap:8px; }
+.opt-label{ font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--c); }
+
+.decide{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.dtree, .dtree ul{ list-style:none; padding-left:16px; margin:0; border-left:2px solid var(--map-line); display:flex; flex-direction:column; gap:4px; }
+.dtree{ margin-left:6px; }
+.dtree li{ position:relative; padding:6px 0 6px 12px; line-height:1.5; }
+.dtree li::before{ content:""; position:absolute; left:-16px; top:19px; width:22px; border-top:2px solid var(--map-line); }
+.dtree ul{ margin-top:6px; }
+.dk{ font-family:var(--f-mono); font-weight:600; font-size:.92rem; background:var(--code); padding:2px 7px; border-radius:6px; white-space:nowrap; }
+.out{ display:inline-block; font-weight:700; font-size:.9rem; padding:2px 9px; border-radius:6px; white-space:nowrap; text-decoration:none; }
+.out.new{ background:var(--map); color:var(--on-map); }
+.out.fk{ border:1.5px solid var(--map); color:var(--map); }
+.out.join{ border:1.5px dashed var(--map); color:var(--map); }
+.dn{ color:var(--muted); font-size:.93rem; }
+
+.qs{ display:flex; flex-direction:column; gap:8px; }
+details.q{ background:var(--surface); border:1px solid var(--line); border-radius:10px; }
+details.q summary{ cursor:pointer; padding:12px 14px; font-weight:700; list-style:none; display:flex; gap:10px; }
+details.q summary::-webkit-details-marker{ display:none; }
+details.q summary::before{ content:"+"; flex:none; width:22px; height:22px; border-radius:6px; background:var(--code); color:var(--ink); display:grid; place-items:center; font-family:var(--f-mono); font-size:.95rem; }
+details.q[open] summary::before{ content:"−"; background:var(--ink); color:var(--bg); }
+details.q > div{ padding:0 14px 14px 46px; display:flex; flex-direction:column; gap:8px; }
+.qtag{ font-family:var(--f-mono); font-size:.8rem; color:var(--muted); font-weight:600; margin-left:auto; padding-left:8px; white-space:nowrap; }
+
+.vids{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+.vid{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+.vid-top{ display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; }
+.vid-meta{ font-size:.85rem; color:var(--muted); }
+.vid-title{ font-family:var(--f-display); font-weight:600; font-size:1.08rem; color:var(--rel); text-decoration-thickness:1.5px; text-underline-offset:3px; overflow-wrap:anywhere; }
+.vid p{ font-size:.97rem; }
+.vid .vid-diff{ color:var(--muted); font-size:.92rem; }
+.vid .vid-diff b{ color:var(--warn); }
+.vid-jump{ font-size:.9rem; font-weight:700; color:var(--rel); }
+.st{ font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:2px 8px; border-radius:6px; border:1.5px solid; white-space:nowrap; }
+.st.ok{ color:var(--er); border-color:var(--er-line); background:var(--er-soft); }
+.st.casi{ color:var(--map); border-color:var(--map-line); background:var(--map-soft); }
+.st.no{ color:var(--warn); border-color:var(--warn-line); background:var(--warn-soft); }
+.st.tema{ color:var(--muted); border-color:var(--line); background:var(--code); }
+
+footer{ margin-top:56px; padding-top:16px; border-top:1px solid var(--line); font-size:.85rem; color:var(--muted); }
+</style>
+
+<nav class="topnav" aria-label="Secciones">
+  <div class="topnav-in">
+    <a href="#mapa">Mapa</a>
+    <a class="nv-er" href="#er"><b>1</b>Modelo ER</a>
+    <a class="nv-rl" href="#rel"><b>2</b>Modelo relacional</a>
+    <a class="nv-mp" href="#paso"><b>3</b>Del ER a tablas</a>
+    <a class="nv-fn" href="#final"><b>4</b>Repaso final</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <p class="eyebrow">Bases de Datos · 1º DAM · Examen del 13-11-2026</p>
+  <h1>Modelo ER y modelo relacional</h1>
+  <p class="lead">Resumen de los 5 PDF de clase, explicado fácil. Los ejemplos son los de los apuntes, con sus nombres en inglés o catalán, para que los reconozcas en el examen.</p>
+  <ol class="howto" aria-label="Cómo usar esta página">
+    <li>Mira el mapa para ver todo el temario de un vistazo.</li>
+    <li>Estudia los temas 1, 2 y 3 en orden. Cada uno empieza con «Lo esencial».</li>
+    <li>Acaba con el tema 4: trampas, preguntas de repaso y vídeos.</li>
+  </ol>
+  <p class="sources">Fuentes: <b>er model</b> · <b>Cardinality</b> · <b>RelationalModel</b> · <b>From ERD to Relational Model</b> · <b>ERD to Relational TABLE</b></p>
+</header>
+
+<main>
+
+<!-- =================== MAPA =================== -->
+<section id="mapa" class="wide map-sec">
+  <div class="intro">
+    <h2>Mapa del temario</h2>
+    <p class="muted" style="max-width:44rem">Primero dibujas el mundo real (tema 1), luego aprendes cómo son las tablas (tema 2) y por último pasas el dibujo a tablas (tema 3). Toca cualquier apartado para ir a él.</p>
+  </div>
+
+  <div class="map">
+    <div class="map-root">
+      <span class="eyebrow">Diseñar una base de datos</span>
+      <strong>Del mundo real a las tablas</strong>
+    </div>
+
+    <div class="map-branches">
+      <div class="branch er">
+        <a class="branch-head" href="#er"><span class="bn">1</span><span class="bt"><span class="k">Diseño conceptual · el dibujo</span><span class="t">Modelo ER</span></span></a>
+        <ul class="leaves">
+          <li><a href="#er-que"><span class="ln-n">1.1</span><span class="ln-t"><b>Qué es y fases del diseño</b><small>conceptual → lógico → físico</small></span></a></li>
+          <li><a href="#er-entidades"><span class="ln-n">1.2</span><span class="ln-t"><b>Entidades</b><small>rectángulo ▭ · STUDENT</small></span></a></li>
+          <li><a href="#er-atributos"><span class="ln-n">1.3</span><span class="ln-t"><b>Atributos y clave primaria</b><small>óvalo ◯ · simple, compuesto, derivado</small></span></a></li>
+          <li><a href="#er-relaciones"><span class="ln-n">1.4</span><span class="ln-t"><b>Relaciones y grado</b><small>rombo ◇ · une 1, 2 o 3 entidades</small></span></a></li>
+          <li><a href="#er-cardinalidad"><span class="ln-n">1.5</span><span class="ln-t"><b>Cardinalidad</b><small>1:1 · 1:N · N:1 · N:M</small></span></a></li>
+          <li><a href="#er-participacion"><span class="ln-n">1.6</span><span class="ln-t"><b>Participación (min,max)</b><small>(0,1) (1,1) (0,N) (1,N)</small></span></a></li>
+          <li><a href="#er-otras"><span class="ln-n">1.7</span><span class="ln-t"><b>Ternarias y recursivas</b><small>3 entidades · una consigo misma</small></span></a></li>
+          <li><a href="#er-herencia"><span class="ln-n">1.8</span><span class="ln-t"><b>Herencia</b><small>triángulo ▽ · padre e hijos</small></span></a></li>
+          <li><a href="#er-notacion"><span class="ln-n">1.9</span><span class="ln-t"><b>Chen y Crow's foot</b><small>dos formas de dibujar</small></span></a></li>
+          <li><a href="#er-ejemplo"><span class="ln-n">1.10</span><span class="ln-t"><b>Ejemplo completo</b><small>departamentos y empleados</small></span></a></li>
+        </ul>
+      </div>
+
+      <div class="branch rl">
+        <a class="branch-head" href="#rel"><span class="bn">2</span><span class="bt"><span class="k">Diseño lógico · las tablas</span><span class="t">Modelo relacional</span></span></a>
+        <ul class="leaves">
+          <li><a href="#rel-que"><span class="ln-n">2.1</span><span class="ln-t"><b>Qué es</b><small>tablas · Codd, 1970</small></span></a></li>
+          <li><a href="#rel-tablas"><span class="ln-n">2.2</span><span class="ln-t"><b>Cómo es una tabla</b><small>fila, columna, celda · esquema, extensión</small></span></a></li>
+          <li><a href="#rel-grado"><span class="ln-n">2.3</span><span class="ln-t"><b>Grado y cardinalidad</b><small>nº de columnas · nº de filas</small></span></a></li>
+          <li><a href="#rel-claves"><span class="ln-n">2.4</span><span class="ln-t"><b>Claves</b><small>candidata, primaria, alternativa, foránea</small></span></a></li>
+          <li><a href="#rel-restricciones"><span class="ln-n">2.5</span><span class="ln-t"><b>Restricciones</b><small>PRIMARY KEY, UNIQUE, NOT NULL, FK</small></span></a></li>
+          <li><a href="#rel-integridad"><span class="ln-n">2.6</span><span class="ln-t"><b>Integridad referencial</b><small>CASCADE, RESTRICT, SET NULL…</small></span></a></li>
+          <li><a href="#rel-triggers"><span class="ln-n">2.7</span><span class="ln-t"><b>Triggers</b><small>acciones automáticas</small></span></a></li>
+        </ul>
+      </div>
+
+      <div class="branch mp">
+        <a class="branch-head" href="#paso"><span class="bn">3</span><span class="bt"><span class="k">Entra el dibujo · salen tablas</span><span class="t">Del ER a tablas</span></span></a>
+        <ul class="leaves">
+          <li><a href="#paso-reglas"><span class="ln-n">3.1</span><span class="ln-t"><b>Reglas básicas</b><small>entidad → tabla · cómo se escribe</small></span></a></li>
+          <li><a href="#paso-arbol"><span class="ln-n">3.2</span><span class="ln-t"><b>¿Qué hago con cada relación?</b><small>el árbol de decisión</small></span></a></li>
+          <li><a href="#paso-nm"><span class="ln-n">3.3</span><span class="ln-t"><b>N:M</b><small>siempre tabla nueva</small></span></a></li>
+          <li><a href="#paso-1n"><span class="ln-n">3.4</span><span class="ln-t"><b>1:N</b><small>FK en el lado N</small></span></a></li>
+          <li><a href="#paso-11"><span class="ln-n">3.5</span><span class="ln-t"><b>1:1</b><small>juntar, tabla nueva o FK + UNIQUE</small></span></a></li>
+          <li><a href="#paso-ternaria"><span class="ln-n">3.6</span><span class="ln-t"><b>Ternaria</b><small>tabla nueva · PK según el caso</small></span></a></li>
+          <li><a href="#paso-recursiva"><span class="ln-n">3.7</span><span class="ln-t"><b>Recursiva</b><small>FK a la misma tabla</small></span></a></li>
+          <li><a href="#paso-herencia"><span class="ln-n">3.8</span><span class="ln-t"><b>Herencia</b><small>tabla por clase · PK = FK</small></span></a></li>
+          <li><a href="#resumen"><span class="ln-n">3.9</span><span class="ln-t"><b>Tabla resumen</b><small>todos los casos juntos</small></span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="map-final">
+      <span class="bn">4</span><span class="t">Repaso final</span>
+      <a href="#ojo"><span>4.1</span>Trampas</a>
+      <a href="#repaso"><span>4.2</span>Preguntas</a>
+      <a href="#videos"><span>4.3</span>Vídeos</a>
+    </div>
+  </div>
+
+  <div class="conn">
+    <h3>Qué se convierte en qué</h3>
+    <p class="conn-head">Izquierda: en el dibujo (tema 1) · derecha: en las tablas (tema 2)</p>
+    <div class="conn-grid">
+      <div class="conn-row"><span class="pill er">Entidad (rectángulo)</span><span class="arrow">→</span><span class="pill rl">Tabla</span></div>
+      <div class="conn-row"><span class="pill er">Relación 1:N</span><span class="arrow">→</span><span class="pill rl">FK en la tabla del lado N</span></div>
+      <div class="conn-row"><span class="pill er">Atributo (óvalo)</span><span class="arrow">→</span><span class="pill rl">Columna</span></div>
+      <div class="conn-row"><span class="pill er">Relación 1:1</span><span class="arrow">→</span><span class="pill rl">FK con UNIQUE, o juntar tablas</span></div>
+      <div class="conn-row"><span class="pill er">Clave primaria (subrayada)</span><span class="arrow">→</span><span class="pill rl">PRIMARY KEY</span></div>
+      <div class="conn-row"><span class="pill er">Relación N:M o ternaria</span><span class="arrow">→</span><span class="pill rl">Tabla nueva</span></div>
+      <div class="conn-row"><span class="pill er">Participación obligatoria (mínimo 1)</span><span class="arrow">→</span><span class="pill rl">FK con NOT NULL</span></div>
+      <div class="conn-row"><span class="pill er">Herencia (triángulo)</span><span class="arrow">→</span><span class="pill rl">Tabla por clase, PK = FK</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== TEMA 1 =================== -->
+<section id="er" class="topic er wrap">
+  <header class="topic-head">
+    <span class="bn">1</span>
+    <div>
+      <p class="eyebrow">Tema 1 · Diseño conceptual</p>
+      <h2>Modelo Entidad-Relación (ER)</h2>
+      <p class="src">PDF: er model · Cardinality</p>
+    </div>
+  </header>
+  <div class="esencial">
+    <strong>Lo esencial</strong>
+    <ul>
+      <li>El modelo ER es el <b>dibujo</b> de la base de datos, antes de pensar en tablas.</li>
+      <li><b>Entidad</b> = rectángulo · <b>atributo</b> = óvalo · <b>relación</b> = rombo · <b>herencia</b> = triángulo.</li>
+      <li>La <b>cardinalidad</b> (1:1, 1:N, N:M) dice cuántos se unen con cuántos.</li>
+      <li>La <b>participación</b> (min,max) dice si es <b>obligatoria</b> (mínimo 1) u <b>opcional</b> (mínimo 0).</li>
+    </ul>
+  </div>
+
+  <article class="sub" id="er-que">
+    <div class="sub-head"><h3><span class="n">1.1</span>Qué es y fases del diseño</h3></div>
+    <p class="idea">Es un dibujo para pensar la base de datos sin depender de ningún programa.</p>
+    <p>Se llama modelo <b>conceptual</b> y tiene tres piezas: <b>entidades</b> (las cosas), <b>atributos</b> (sus datos) y <b>relaciones</b> (cómo se unen).</p>
+    <div class="tscroll">
+      <table class="sym-table">
+        <caption>Las piezas del dibujo (notación Chen)</caption>
+        <thead><tr><th>Figura</th><th>Qué es</th><th>Para qué</th></tr></thead>
+        <tbody>
+          <tr><td>▭ Rectángulo</td><td>Entidad</td><td>Un tipo de cosa: STUDENT</td></tr>
+          <tr><td>◯ Óvalo</td><td>Atributo</td><td>Un dato de la entidad</td></tr>
+          <tr><td>◯ subrayado</td><td>Atributo clave</td><td>Identifica cada elemento (clave primaria)</td></tr>
+          <tr><td>◇ Rombo</td><td>Relación</td><td>Une entidades</td></tr>
+          <tr><td>▽ Triángulo</td><td>Herencia</td><td>Padre e hijos</td></tr>
+          <tr><td>— Líneas</td><td>Uniones</td><td>Atributo–entidad: sin etiqueta. Entidad–relación: con 1, N o M (la cardinalidad)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h4>Las 3 fases del diseño de una base de datos</h4>
+    <ol class="clean">
+      <li><b>Diseño conceptual</b>: el modelo ER. Primero se recoge información con entrevistas a los futuros usuarios, revisando su documentación y observando los procesos que se van a informatizar. Después se dibuja el ER con entidades, relaciones, cardinalidades y atributos.</li>
+      <li><b>Diseño lógico</b>: se traduce el ER al modelo del SGBD. Hay varios modelos (jerárquico, relacional, distribuido, orientado a objetos), pero lo más común es pasarlo al <b>relacional</b>. Es el tema 3.</li>
+      <li><b>Diseño físico</b>: decisiones de bajo nivel en el SGBD, como crear índices, reservar espacio para las tablas y prever su crecimiento, elegir el tamaño del buffer y ajustar parámetros. Depende de las consultas, de cuánto cambian los datos y de cuántos datos hay.</li>
+    </ol>
+  </article>
+
+  <article class="sub" id="er-entidades">
+    <div class="sub-head"><h3><span class="n">1.2</span>Entidades <span class="en">entity</span></h3></div>
+    <p class="idea">Una entidad es algo del mundo real del que queremos guardar datos. Piensa en un sustantivo.</p>
+    <ul class="clean">
+      <li><b>Tangible</b> (se puede tocar): Student, Car, Employee.</li>
+      <li><b>Intangible</b> (una idea): Course, Job Position.</li>
+      <li>Ejemplo: en un colegio, Student, Professor y Course son entidades.</li>
+    </ul>
+    <div class="tip"><strong>Cómo se escribe</strong><p>Rectángulo con el nombre en <b>MAYÚSCULAS</b> y en <b>singular</b>: <code>STUDENT</code>. Sin tildes ni caracteres especiales, solo letras y números. El rectángulo STUDENT representa a todos los estudiantes.</p></div>
+  </article>
+
+  <article class="sub" id="er-atributos">
+    <div class="sub-head"><h3><span class="n">1.3</span>Atributos y clave primaria <span class="en">attributes</span></h3></div>
+    <p class="idea">Los atributos son los datos que describen una entidad. Cada uno acabará siendo una columna.</p>
+    <p>Se dibujan como óvalos unidos al rectángulo con una línea.</p>
+    <figure class="fig">
+      <svg class="chen" viewBox="0 0 440 128" role="img" aria-label="Entidad STUDENT con cuatro atributos: ID, Name, Address y Birthdate">
+        <line class="ln" x1="180" y1="46" x2="70" y2="88"/><line class="ln" x1="205" y1="46" x2="170" y2="88"/>
+        <line class="ln" x1="235" y1="46" x2="270" y2="88"/><line class="ln" x1="260" y1="46" x2="370" y2="88"/>
+        <rect class="ent" x="160" y="8" width="120" height="38"/><text class="ent-t" x="220" y="32">STUDENT</text>
+        <ellipse class="att" cx="56" cy="104" rx="48" ry="16"/><text class="att-t" x="56" y="108.5">ID</text>
+        <ellipse class="att" cx="164" cy="104" rx="48" ry="16"/><text class="att-t" x="164" y="108.5">Name</text>
+        <ellipse class="att" cx="276" cy="104" rx="48" ry="16"/><text class="att-t" x="276" y="108.5">Address</text>
+        <ellipse class="att" cx="384" cy="104" rx="48" ry="16"/><text class="att-t" x="384" y="108.5">Birthdate</text>
+      </svg>
+      <figcaption>STUDENT y sus atributos (er model, p. 6).</figcaption>
+    </figure>
+    <h4>Tipos de atributo</h4>
+    <div class="grid2">
+      <div class="card"><h4>Simple</h4><p>No se puede dividir sin perder su sentido.</p></div>
+      <div class="card"><h4>Compuesto</h4><p>Se divide en partes que también tienen sentido. Ej.: <i>Cognoms</i> (apellidos) → Cognoms 1 y Cognoms 2.</p></div>
+      <div class="card"><h4>Derivado</h4><p>Su valor se puede <b>calcular</b> con otros atributos o con entidades relacionadas.</p></div>
+      <div class="card"><h4>Valor NULL</h4><p>Un atributo puede quedarse sin valor. Entonces se dice que vale NULL.</p></div>
+    </div>
+    <h4>Clave primaria <span class="en">primary key, PK</span></h4>
+    <p>Cada elemento se tiene que poder distinguir de los demás. El atributo (o grupo de atributos) que lo identifica de forma única es la <b>clave primaria</b>. En el diagrama va <u>subrayado</u> o marcado con «PK». Ej.: <u>DNI</u>.</p>
+    <div class="tip"><strong>Cómo se escriben los nombres</strong>
+      <ul class="clean">
+        <li>Primera letra en mayúscula y el resto en minúscula: <code>Name</code>.</li>
+        <li>Nombre compuesto: cada palabra empieza en mayúscula (<b>PascalCase</b>): <code>TelefonFix</code>, <code>TelefonMobil</code>.</li>
+        <li>Siglas, todo en mayúsculas: <code>DNI</code>.</li>
+      </ul>
+    </div>
+  </article>
+
+  <article class="sub" id="er-relaciones">
+    <div class="sub-head"><h3><span class="n">1.4</span>Relaciones y grado <span class="en">relationships</span></h3></div>
+    <p class="idea">Una relación une dos o más entidades. Se dibuja con un rombo.</p>
+    <p>Si la relación tiene datos propios, se le ponen atributos igual que a una entidad.</p>
+    <figure class="fig">
+      <div data-k="bin" data-a="ALUMNE" data-rel="Matricula" data-b="ASSIGNATURA" data-attr="NotaFinal" data-aria="ALUMNE se relaciona con ASSIGNATURA mediante Matricula, que tiene el atributo NotaFinal"></div>
+      <figcaption>La relación <i>Matricula</i> une ALUMNE y ASSIGNATURA. <i>NotaFinal</i> es un atributo de la relación (er model, p. 11-12).</figcaption>
+    </figure>
+    <p>El <b>grado</b> de una relación es cuántas entidades une:</p>
+    <div class="grid2">
+      <div class="card"><h4>Grado 1 · recursiva</h4><p>Una entidad consigo misma. Ej.: ASSIGNATURA es prerrequisito de ASSIGNATURA.</p></div>
+      <div class="card"><h4>Grado 2 · binaria</h4><p>Dos entidades. Ej.: ALUMNE – Matricula – ASSIGNATURA.</p></div>
+      <div class="card"><h4>Grado 3 · ternaria</h4><p>Tres entidades. Ej.: ALUMNE, ASSIGNATURA y CURS en Matricula.</p></div>
+    </div>
+  </article>
+
+  <article class="sub" id="er-cardinalidad">
+    <div class="sub-head"><h3><span class="n">1.5</span>Cardinalidad <span class="en">mapping cardinality</span></h3></div>
+    <p class="idea">La cardinalidad dice cuántos elementos de una entidad se unen con cuántos de la otra.</p>
+    <p>Entre dos entidades hay 3 tipos. El dibujo de la izquierda de cada tipo es el «Cuando dudes…» del PDF: cada línea une un elemento de un lado con uno del otro.</p>
+    <div class="cardrows">
+      <div class="cardrow">
+        <div class="sets" data-k="sets" data-p="1-4,2-5,3-6" data-aria="Uno a uno: cada elemento se une con uno solo"></div>
+        <div class="body">
+          <h4><span class="tag">1:1</span>Uno a uno <span class="en">one to one</span></h4>
+          <p>Cada elemento de A va con <b>uno solo</b> de B, y al revés. Ej.: cada cliente tiene un usuario y contraseña, y ese usuario es solo suyo.</p>
+          <div data-k="bin" data-a="Customer" data-rel="Has" data-b="UserDetails" data-la="1" data-lb="1" data-aria="Customer 1 a 1 con UserDetails"></div>
+          <p class="pizza">Pizza: una porción por persona.</p>
+        </div>
+      </div>
+      <div class="cardrow">
+        <div class="sets" data-k="sets" data-p="1-4,1-5,2-6" data-aria="Uno a muchos: un elemento de la izquierda se une con varios de la derecha"></div>
+        <div class="body">
+          <h4><span class="tag">1:N</span>Uno a muchos <span class="en">one to many</span></h4>
+          <p>Uno de A va con <b>muchos</b> de B, pero cada uno de B va con <b>un solo</b> A. Ej.: una bodega vende muchos vinos; cada vino es de una sola bodega.</p>
+          <div data-k="bin" data-a="Winery" data-rel="Makes" data-b="Wine" data-la="1" data-lb="N" data-aria="Winery 1 a N con Wine"></div>
+          <p class="pizza">Pizza: una persona come muchas porciones y no las comparte.</p>
+        </div>
+      </div>
+      <div class="cardrow">
+        <div class="sets" data-k="sets" data-p="1-4,2-4,3-6" data-aria="Muchos a uno: varios elementos de la izquierda se unen con uno de la derecha"></div>
+        <div class="body">
+          <h4><span class="tag">N:1</span>Muchos a uno <span class="en">many to one</span></h4>
+          <p>Es la 1:N vista desde el otro lado. Las 1:N y N:1 son las relaciones más comunes.</p>
+          <div data-k="bin" data-a="STUDENT" data-rel="HAS" data-b="MODULE" data-la="N" data-lb="1" data-aria="STUDENT N a 1 con MODULE"></div>
+          <p class="pizza">Pizza: cada persona come una sola porción, pero la porción se comparte.</p>
+        </div>
+      </div>
+      <div class="cardrow">
+        <div class="sets" data-k="sets" data-p="1-4,1-5,2-4,3-5" data-aria="Muchos a muchos: los elementos de ambos lados se unen con varios"></div>
+        <div class="body">
+          <h4><span class="tag">N:M</span>Muchos a muchos <span class="en">many to many</span></h4>
+          <p>Cada uno de A va con <b>muchos</b> de B y cada uno de B con <b>muchos</b> de A. Ej.: una bodega usa varias empresas de reparto y cada empresa trabaja para varias bodegas.</p>
+          <div data-k="bin" data-a="Winery" data-rel="Employs" data-b="DeliveryFirm" data-la="N" data-lb="M" data-aria="Winery N a M con DeliveryFirm"></div>
+          <p class="pizza">Pizza: todos comen las porciones que quieran y las comparten.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="sub" id="er-participacion">
+    <div class="sub-head"><h3><span class="n">1.6</span>Participación (min,max) <span class="en">min-max notation</span></h3></div>
+    <p class="idea">La participación dice el mínimo y el máximo exactos. Mínimo 0 = opcional. Mínimo 1 = obligatoria.</p>
+    <p>La cardinalidad (1:N) da la idea general; el (min,max) da el detalle.</p>
+    <div class="tscroll">
+      <table class="sym-table">
+        <thead><tr><th>Se escribe</th><th>Significa</th></tr></thead>
+        <tbody>
+          <tr><td>(1,1) o 1</td><td>Exactamente uno: siempre hay uno, y solo uno</td></tr>
+          <tr><td>(0,1) o 0..1</td><td>Cero o uno: puede no haber ninguno</td></tr>
+          <tr><td>(0,N) o 0..N</td><td>Cero, uno o muchos</td></tr>
+          <tr><td>(1,N) o 1..N</td><td>Uno o muchos: siempre al menos uno</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">El formato 0..1 es más típico de la notación UML.</p>
+    <figure class="fig">
+      <div data-k="bin" data-a="DEPARTMENT" data-rel="BelongsTo" data-b="EMPLOYEE" data-la="(1,1)" data-lb="(0,N)" data-top="1:N" data-aria="DEPARTMENT (1,1) BelongsTo (0,N) EMPLOYEE, relación 1:N"></div>
+      <figcaption>Cada empleado pertenece a <b>exactamente un</b> departamento → (1,1). Un departamento tiene <b>cero o más</b> empleados → (0,N) (Cardinality, p. 14 y 18).</figcaption>
+    </figure>
+    <div class="tip"><strong>Cómo leer el dibujo</strong><p>En los dibujos de clase el número va pegado a la entidad que se cuenta. El (1,1) está junto a DEPARTMENT porque dice <i>cuántos departamentos tiene cada empleado</i>. Se lee cruzando: «un EMPLOYEE pertenece a (1,1) DEPARTMENT».</p></div>
+    <div class="ojo"><strong>Ojo</strong><p>En <i>er model</i> (p. 22), el ejemplo <code>Student (0,1) — (1,1) Locker</code> se explica al revés: cada número habla de la entidad que tiene al lado («un alumno puede tener 0 o 1 taquilla; cada taquilla es de 1 alumno»). En el examen, escribe también la frase con palabras y así no hay duda.</p></div>
+    <p><b>Recuerda:</b> «1:1» no dice si es obligatoria u opcional. «(min,max)» sí.</p>
+  </article>
+
+  <article class="sub" id="er-otras">
+    <div class="sub-head"><h3><span class="n">1.7</span>Ternarias y recursivas</h3></div>
+    <h4>Ternaria (grado 3)</h4>
+    <p>Une tres entidades. Puede ser <code>1:1:1</code>, <code>1:1:N</code>, <code>1:M:N</code> o <code>M:N:P</code>.</p>
+    <figure class="fig">
+      <div data-k="ter" data-a="ALUMNE" data-rel="Matricula" data-b="ASSIGNATURA" data-c="CURS" data-aria="Relación ternaria Matricula entre ALUMNE, ASSIGNATURA y CURS"></div>
+      <figcaption>Un alumno se matricula de una asignatura en un curso (er model, p. 13 y 18).</figcaption>
+    </figure>
+    <h4>Recursiva o reflexiva (grado 1)</h4>
+    <p>Une elementos de una entidad con otros elementos <b>de la misma</b> entidad. Solo participa una entidad, pero con dos <b>roles</b> (papeles).</p>
+    <figure class="fig">
+      <div data-k="rec" data-e="EMPLOYEE" data-rel="HAS" data-l1="(0,1)" data-r1="subordinado" data-l2="(0,N)" data-r2="jefe" data-top="1:N" data-aria="EMPLOYEE se relaciona consigo mismo con los roles jefe y subordinado"></div>
+      <figcaption>Rol <b>jefe</b>: mínimo 0 (el empleado más bajo no manda a nadie), máximo N (puede mandar a muchos). Rol <b>subordinado</b>: mínimo 0 (el CEO no tiene jefe), máximo 1 (solo un jefe) (Cardinality, p. 16).</figcaption>
+    </figure>
+  </article>
+
+  <article class="sub" id="er-herencia">
+    <div class="sub-head"><h3><span class="n">1.8</span>Herencia <span class="en">inheritance</span></h3></div>
+    <p class="idea">El padre guarda los atributos comunes; los hijos los heredan y añaden los suyos.</p>
+    <p>Así no repites atributos. Es como una relación padre-hijo y se dibuja con un <b>triángulo invertido</b>.</p>
+    <figure class="fig">
+      <div data-k="inh" data-p="PERSON" data-ch="STUDENT,TEACHER" data-aria="PERSON es el padre de STUDENT y TEACHER"></div>
+      <figcaption>PERSON tiene <i>name</i> y <i>age</i>; STUDENT añade <i>student_id</i> y TEACHER añade <i>employee_id</i> (Cardinality, p. 17). Otro ejemplo del PDF: Person (Name, Address) es padre de Student (Grade) y Teacher (Salary).</figcaption>
+    </figure>
+  </article>
+
+  <article class="sub" id="er-notacion">
+    <div class="sub-head"><h3><span class="n">1.9</span>Chen y Crow's foot</h3></div>
+    <p class="idea">Son dos formas de dibujar lo mismo: Chen escribe números y Crow's foot dibuja símbolos.</p>
+    <div class="tscroll">
+      <table class="sym-table">
+        <thead><tr><th>Chen</th><th>Crow's foot</th><th>Significa</th></tr></thead>
+        <tbody>
+          <tr><td>1 · (1,1)</td><td><svg class="cf" viewBox="0 0 120 30" role="img" aria-label="Una raya"><line x1="4" y1="15" x2="116" y2="15"/><line x1="22" y1="5" x2="22" y2="25"/></svg></td><td>Uno <span class="en">one</span></td></tr>
+          <tr><td>1 · (1,1)</td><td><svg class="cf" viewBox="0 0 120 30" role="img" aria-label="Dos rayas"><line x1="4" y1="15" x2="116" y2="15"/><line x1="16" y1="5" x2="16" y2="25"/><line x1="26" y1="5" x2="26" y2="25"/></svg></td><td>Solo uno <span class="en">only one</span></td></tr>
+          <tr><td>(0,1)</td><td><svg class="cf" viewBox="0 0 120 30" role="img" aria-label="Raya y círculo"><line x1="4" y1="15" x2="116" y2="15"/><line x1="16" y1="5" x2="16" y2="25"/><circle cx="32" cy="15" r="6"/></svg></td><td>Cero o uno <span class="en">zero or one</span></td></tr>
+          <tr><td>M</td><td><svg class="cf" viewBox="0 0 120 30" role="img" aria-label="Pata de gallo"><line x1="4" y1="15" x2="116" y2="15"/><polyline points="4,4 22,15 4,26"/></svg></td><td>Cero o más <span class="en">zero or more</span></td></tr>
+          <tr><td>M · (1,M)</td><td><svg class="cf" viewBox="0 0 120 30" role="img" aria-label="Pata de gallo y raya"><line x1="4" y1="15" x2="116" y2="15"/><polyline points="4,4 22,15 4,26"/><line x1="28" y1="5" x2="28" y2="25"/></svg></td><td>Uno o más <span class="en">1 or more</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sub" id="er-ejemplo">
+    <div class="sub-head"><h3><span class="n">1.10</span>Ejemplo completo del PDF</h3></div>
+    <p>Una empresa quiere guardar sus departamentos y empleados (Cardinality, p. 18-19):</p>
+    <ul class="clean">
+      <li>Cada departamento tiene un identificador único (<b>DeptID</b>), un nombre y una sala (Room).</li>
+      <li>Cada empleado tiene un identificador único (<b>EmployeeID</b>), nombre, apellido, salario y fecha de contratación.</li>
+      <li>Cada empleado pertenece a <b>exactamente un</b> departamento; un departamento puede tener <b>cero o más</b> empleados.</li>
+      <li>Un empleado tiene <b>cero o un</b> jefe; un jefe supervisa a <b>cero o más</b> empleados.</li>
+    </ul>
+    <figure class="fig">
+      <div class="fig-scroll">
+        <svg class="chen big" viewBox="0 0 680 290" role="img" aria-label="Diagrama ER: DEPARTMENT (1,1) BelongsTo (0,N) EMPLOYEE, y EMPLOYEE se relaciona consigo mismo con Has, roles jefe y subordinado">
+          <line class="ln" x1="180" y1="142" x2="214" y2="142"/><line class="ln" x1="326" y1="142" x2="400" y2="142"/>
+          <path class="ln" d="M470 120 V60 H560"/><path class="ln" d="M600 82 V142 H540"/>
+          <line class="ln" x1="85" y1="164" x2="64" y2="208"/><line class="ln" x1="110" y1="164" x2="110" y2="248"/><line class="ln" x1="140" y1="164" x2="160" y2="208"/>
+          <line class="ln" x1="420" y1="164" x2="375" y2="198"/><line class="ln" x1="445" y1="164" x2="415" y2="248"/><line class="ln" x1="480" y1="164" x2="490" y2="248"/><line class="ln" x1="515" y1="164" x2="570" y2="248"/><line class="ln" x1="535" y1="164" x2="620" y2="200"/>
+          <rect class="ent" x="40" y="120" width="140" height="44"/><text class="ent-t" x="110" y="147">DEPARTMENT</text>
+          <polygon class="rel" points="214,142 270,116 326,142 270,168"/><text class="rel-t" x="270" y="146.5">BelongsTo</text>
+          <rect class="ent" x="400" y="120" width="140" height="44"/><text class="ent-t" x="470" y="147">EMPLOYEE</text>
+          <polygon class="rel" points="560,60 600,38 640,60 600,82"/><text class="rel-t" x="600" y="64.5">Has</text>
+          <text class="card-t" x="186" y="135">(1,1)</text><text class="card-t end" x="394" y="135">(0,N)</text><text class="top-t" x="270" y="106">1:N</text>
+          <text class="card-t" x="476" y="110">(0,1)</text><text class="role-t" x="515" y="52">subordinado</text>
+          <text class="card-t" x="546" y="135">(0,N)</text><text class="role-t" x="606" y="114" style="text-anchor:start">jefe</text><text class="top-t" x="600" y="28">1:N</text>
+          <ellipse class="att" cx="60" cy="222" rx="34" ry="14"/><text class="att-t pk" x="60" y="226.5">DeptID</text>
+          <ellipse class="att" cx="110" cy="262" rx="34" ry="14"/><text class="att-t" x="110" y="266.5">Name</text>
+          <ellipse class="att" cx="165" cy="222" rx="34" ry="14"/><text class="att-t" x="165" y="226.5">Room</text>
+          <ellipse class="att" cx="362" cy="212" rx="46" ry="14"/><text class="att-t pk" x="362" y="216.5">EmployeeID</text>
+          <ellipse class="att" cx="410" cy="262" rx="32" ry="14"/><text class="att-t" x="410" y="266.5">Name</text>
+          <ellipse class="att" cx="490" cy="262" rx="40" ry="14"/><text class="att-t" x="490" y="266.5">Surname</text>
+          <ellipse class="att" cx="580" cy="262" rx="42" ry="14"/><text class="att-t" x="580" y="266.5">HireDate</text>
+          <ellipse class="att" cx="640" cy="212" rx="34" ry="14"/><text class="att-t" x="640" y="216.5">Salary</text>
+        </svg>
+      </div>
+      <figcaption>El diagrama de la solución, con las claves primarias subrayadas. En el móvil, desliza el dibujo hacia los lados. En el repaso final (4.2) tienes la pregunta del PDF y el ejercicio de pasarlo a tablas.</figcaption>
+    </figure>
+  </article>
+</section>
+
+<!-- =================== TEMA 2 =================== -->
+<section id="rel" class="topic rl wrap">
+  <header class="topic-head">
+    <span class="bn">2</span>
+    <div>
+      <p class="eyebrow">Tema 2 · Diseño lógico</p>
+      <h2>Modelo relacional</h2>
+      <p class="src">PDF: RelationalModel · From ERD to Relational Model (p. 2-4)</p>
+    </div>
+  </header>
+  <div class="esencial">
+    <strong>Lo esencial</strong>
+    <ul>
+      <li>El modelo relacional guarda todo en <b>tablas</b>, que en teoría se llaman relaciones: filas y columnas.</li>
+      <li>La <b>clave primaria (PK)</b> identifica cada fila. La <b>clave foránea (FK)</b> apunta a la PK de otra tabla.</li>
+      <li>Restricciones: <b>PRIMARY KEY</b>, <b>UNIQUE</b>, <b>NOT NULL</b> y <b>FOREIGN KEY</b>.</li>
+      <li>En una tabla: <b>grado</b> = nº de columnas y <b>cardinalidad</b> = nº de filas.</li>
+    </ul>
+  </div>
+
+  <article class="sub" id="rel-que">
+    <div class="sub-head"><h3><span class="n">2.1</span>Qué es</h3></div>
+    <p class="idea">Es el modelo que convierte el dibujo en tablas reales.</p>
+    <p>Lo propuso <b>Edgar F. Codd en 1970</b> y hoy es el modelo de datos más usado.</p>
+    <div class="grid2">
+      <div class="card er"><h4>Diagrama ER</h4><p><b>Conceptual</b> y visual. Es el <b>plano</b>: entidades, atributos y relaciones, sin depender de ningún programa.</p></div>
+      <div class="card"><h4>Modelo relacional</h4><p><b>Lógico</b>. Convierte el plano en <b>tablas</b> con filas, columnas, claves primarias y claves foráneas, listas para un SGBD.</p></div>
+    </div>
+    <div class="ojo"><strong>Ojo con la palabra «relationship»</strong><p>En el PDF <i>RelationalModel</i>, «relationship» casi siempre significa <b>tabla</b>. No la confundas con la relación (el rombo) del diagrama ER.</p></div>
+  </article>
+
+  <article class="sub" id="rel-tablas">
+    <div class="sub-head"><h3><span class="n">2.2</span>Cómo es una tabla</h3></div>
+    <p class="idea">Una fila es un objeto real; una columna es un dato de todos ellos.</p>
+    <ul class="clean">
+      <li>Cada tabla tiene un <b>nombre único</b> en la base de datos.</li>
+      <li>Cada <b>fila</b> (o <b>tupla</b>) guarda los datos de un objeto real: un alumno.</li>
+      <li>Cada <b>columna</b> (o <b>atributo</b>) guarda el mismo tipo de dato en todas sus celdas.</li>
+      <li>Cada <b>celda</b> guarda <b>un solo valor</b>.</li>
+    </ul>
+    <div class="tscroll">
+      <table class="data">
+        <caption>Tabla STUDENTS (RelationalModel, p. 6)</caption>
+        <thead><tr><th>DNI</th><th>Name</th><th>Surname</th><th>Telephone</th></tr></thead>
+        <tbody>
+          <tr><td>47126654F</td><td>Josep</td><td>Bel Rovira</td><td>453641282</td></tr>
+          <tr><td>51354897S</td><td>Anna</td><td>Pacheco Cuscó</td><td>723352151</td></tr>
+          <tr><td>56354981L</td><td>Xavier</td><td>Rius Montalvo</td><td>726922235</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid2">
+      <div class="card"><h4>Esquema</h4><p>El nombre de la tabla + sus atributos. El orden de los atributos da igual.</p><p><code>STUDENT (DNI, Name, Surname, Telephone)</code></p></div>
+      <div class="card"><h4>Extensión</h4><p>Todos los datos guardados en las filas. Aquí: los 3 alumnos de la tabla.</p></div>
+    </div>
+    <div class="tip"><strong>Cómo se escriben los nombres</strong>
+      <ul class="clean">
+        <li>Nombre de la tabla en <b>MAYÚSCULAS</b> y mejor en <b>singular</b>.</li>
+        <li>Atributos con la primera letra en mayúscula; siglas todo en mayúsculas (<code>DNI</code>); nombres compuestos en PascalCase (<code>BirthDate</code>, <code>PrivatePhone</code>).</li>
+        <li>Dentro de una tabla <b>no se repite</b> el nombre de un atributo. En tablas distintas sí se puede.</li>
+        <li>Dos columnas de la misma tabla pueden guardar el mismo tipo de dato aunque signifiquen cosas distintas.</li>
+        <li>Un atributo puede no tener valor: valor <b>nulo</b> (NULL).</li>
+      </ul>
+    </div>
+  </article>
+
+  <article class="sub" id="rel-grado">
+    <div class="sub-head"><h3><span class="n">2.3</span>Grado y cardinalidad de una tabla</h3></div>
+    <div class="grid2">
+      <div class="card"><h4>Grado = nº de columnas</h4><p>STUDENT (DNI, Name, Surname, Telephone) tiene <b>grado 4</b>.</p></div>
+      <div class="card"><h4>Cardinalidad = nº de filas</h4><p>Hay 3 alumnos, así que la <b>cardinalidad es 3</b>.</p></div>
+    </div>
+    <div class="ojo"><strong>Trampa de examen</strong><p>En el <b>ER</b> (tema 1) las mismas palabras significan otra cosa: <b>grado</b> = cuántas entidades une la relación (1, 2 o 3) y <b>cardinalidad</b> = 1:1, 1:N o N:M.</p></div>
+  </article>
+
+  <article class="sub" id="rel-claves">
+    <div class="sub-head"><h3><span class="n">2.4</span>Claves</h3></div>
+    <p class="idea">De las claves que podrían identificar cada fila, eliges una: esa es la clave primaria.</p>
+    <div class="grid2">
+      <div class="card"><h4>Candidatas</h4><p>Atributos que <b>podrían</b> identificar cada fila. Ej.: DNI, NumSS y NumMatricula (son personales e irrepetibles).</p></div>
+      <div class="card"><h4>Primaria (PK)</h4><p>La candidata que <b>eliges</b>. Solo una por tabla. Ej.: DNI. Se subraya.</p></div>
+      <div class="card"><h4>Alternativas</h4><p>Las candidatas que <b>no</b> eliges: NumSS y NumMatricula.</p></div>
+      <div class="card"><h4>Foránea (FK)</h4><p>Atributo que apunta a la clave primaria de <b>otra tabla</b> (o de la misma) para unir filas.</p></div>
+    </div>
+    <pre class="schema"><span class="t">STUDENTS</span> (<u>DNI</u>, NumSS, NumMatricula, Name, Surname, Telephone)</pre>
+    <h4>Ejemplo de claves foráneas (RelationalModel, p. 13-14)</h4>
+    <div class="tscroll">
+      <table class="data">
+        <caption>STUDENT</caption>
+        <thead><tr><th>DNI<span class="pkcol">PK</span></th><th>FirstName</th><th>Surnames</th><th>Phone</th><th>DNIDelegate<span class="fkcol">FK → STUDENT</span></th><th>CodiAula<span class="fkcol">FK → CLASSROOM</span></th></tr></thead>
+        <tbody>
+          <tr><td>47126654F</td><td>Josep</td><td>Bel Rovira</td><td>453641282</td><td>47126654F</td><td>102</td></tr>
+          <tr><td>51354897S</td><td>Anna</td><td>Pacheco Cuscó</td><td>723352151</td><td>51354897S</td><td>201</td></tr>
+          <tr><td>56354981L</td><td>Xavier</td><td>Rius Montalvo</td><td>726922235</td><td>51354897S</td><td>201</td></tr>
+          <tr><td>24583215W</td><td>Mariona</td><td>Castellví Mur</td><td><span class="null">NULL</span></td><td><span class="null">NULL</span></td><td><span class="null">NULL</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tscroll" style="max-width:18rem">
+      <table class="data">
+        <caption>CLASSROOM</caption>
+        <thead><tr><th>Codi<span class="pkcol">PK</span></th><th>Capacity</th></tr></thead>
+        <tbody><tr><td>101</td><td>40</td></tr><tr><td>102</td><td>36</td></tr><tr><td>201</td><td>30</td></tr></tbody>
+      </table>
+    </div>
+    <ul class="clean">
+      <li><b>CodiAula</b> apunta a la PK de otra tabla (CLASSROOM.Codi): dice en qué aula está cada alumno.</li>
+      <li><b>DNIDelegate</b> apunta a la PK de <b>la misma</b> tabla (STUDENT.DNI): dice quién es su delegado.</li>
+      <li>Mariona aún no tiene aula ni delegado, por eso sus dos FK valen <b>NULL</b>.</li>
+    </ul>
+    <p>Así se escribe:</p>
+    <pre class="schema"><span class="t">STUDENT</span> (<u>DNI</u>, FirstName, Surnames, Phone, <span class="fk">DNIDelegate</span>, <span class="fk">CodiAula</span>)
+  <span class="k">WHERE</span> {DNIDelegate} <span class="k">REFERENCES</span> STUDENT <span class="k">and</span> {CodiAula} <span class="k">REFERENCES</span> CLASSROOM
+<span class="t">CLASSROOM</span> (<u>Codi</u>, Capacity)</pre>
+  </article>
+
+  <article class="sub" id="rel-restricciones">
+    <div class="sub-head"><h3><span class="n">2.5</span>Restricciones <span class="en">constraints</span></h3></div>
+    <p class="idea">Son las reglas que tienen que cumplir los datos.</p>
+    <div class="grid2">
+      <div class="card"><h4>Inherentes</h4><p>Vienen con el propio modelo relacional. Ej.: cada tabla tiene un nombre único y todas las filas tienen el mismo número de columnas.</p></div>
+      <div class="card"><h4>Semánticas</h4><p>Las pones tú al diseñar, para reflejar el mundo real. Son las cuatro de abajo.</p></div>
+    </div>
+    <div class="tscroll">
+      <table class="sym-table">
+        <thead><tr><th>Restricción</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td>PRIMARY KEY</td><td>Identifica cada registro</td></tr>
+          <tr><td>UNIQUE</td><td>No deja valores repetidos</td></tr>
+          <tr><td>NOT NULL</td><td>No deja valores vacíos (NULL)</td></tr>
+          <tr><td>FOREIGN KEY</td><td>Integridad referencial: la FK tiene que apuntar a algo que existe</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sub" id="rel-integridad">
+    <div class="sub-head"><h3><span class="n">2.6</span>Integridad referencial: qué pasa al borrar o cambiar</h3></div>
+    <p class="idea">Si borras una fila a la que apunta una FK, decides qué pasa con las filas que apuntaban a ella.</p>
+    <p>Ejemplo con las tablas de 2.4: <b>borras el aula 201</b>.</p>
+    <div class="tscroll">
+      <table class="sym-table">
+        <thead><tr><th>Opción</th><th>Regla</th><th>Si borras el aula 201…</th></tr></thead>
+        <tbody>
+          <tr><td>CASCADE</td><td>Se borra o actualiza también en la otra tabla</td><td>Se borran Anna y Xavier</td></tr>
+          <tr><td>RESTRICT</td><td>No te deja borrar ni actualizar mientras haya filas relacionadas</td><td>No te deja borrar el aula</td></tr>
+          <tr><td>SET NULL</td><td>La FK se pone a NULL</td><td>Anna y Xavier quedan con CodiAula = NULL</td></tr>
+          <tr><td>SET DEFAULT</td><td>La FK se pone a un valor por defecto</td><td>Anna y Xavier quedan con el aula por defecto</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sub" id="rel-triggers">
+    <div class="sub-head"><h3><span class="n">2.7</span>Triggers</h3></div>
+    <p class="idea">Un trigger es una regla que funciona como un pequeño programa: si pasa algo, hace unas acciones.</p>
+    <pre class="schema"><span class="k">CREATE TRIGGER</span> check_salary
+<span class="k">BEFORE INSERT ON</span> Employees
+<span class="k">FOR EACH ROW</span>
+<span class="k">BEGIN</span>
+  <span class="k">IF</span> NEW.salary &lt; 0 <span class="k">THEN</span>
+    <span class="k">SIGNAL SQLSTATE</span> '45000'
+    <span class="k">SET MESSAGE_TEXT</span> = 'Salary cannot be negative';
+  <span class="k">END IF</span>;
+<span class="k">END</span>;</pre>
+    <p class="muted">Se lee así: antes de insertar cada empleado, si el salario es negativo, da un error y no lo deja guardar.</p>
+  </article>
+</section>
+
+<!-- =================== TEMA 3 =================== -->
+<section id="paso" class="topic mp wrap">
+  <header class="topic-head">
+    <span class="bn">3</span>
+    <div>
+      <p class="eyebrow">Tema 3 · Del diseño conceptual al lógico</p>
+      <h2>Del diagrama ER a tablas</h2>
+      <p class="src">PDF: From ERD to Relational Model · RelationalModel (p. 15-29) · ERD to Relational TABLE</p>
+    </div>
+  </header>
+  <div class="esencial">
+    <strong>Lo esencial</strong>
+    <ul>
+      <li>Cada <b>entidad</b> se convierte en una <b>tabla</b>.</li>
+      <li><b>N:M</b> y <b>ternarias</b> → siempre <b>tabla nueva</b>.</li>
+      <li><b>1:N</b> → la PK del lado 1 pasa como <b>FK al lado N</b>.</li>
+      <li><b>1:1</b> → depende de la participación: juntar, tabla nueva o FK con UNIQUE.</li>
+      <li>Obligatoria → <b>NOT NULL</b>. Recursiva → FK a la <b>misma tabla</b>. Herencia → <b>tabla por clase</b>.</li>
+    </ul>
+  </div>
+
+  <article class="sub" id="paso-reglas">
+    <div class="sub-head"><h3><span class="n">3.1</span>Reglas básicas y cómo se escribe</h3></div>
+    <ol class="clean">
+      <li>Cada <b>entidad</b> → una <b>tabla</b>. (Las entidades siempre dan tabla.)</li>
+      <li>Sus <b>atributos</b> → <b>columnas</b> de esa tabla.</li>
+      <li>Su <b>clave primaria</b> → <b>clave primaria</b> de la tabla.</li>
+      <li>Después se pasan las <b>relaciones</b>, mirando la cardinalidad y la participación. A veces hay que añadir columnas nuevas que hacen de FK.</li>
+    </ol>
+    <figure class="fig">
+      <div data-k="ent" data-e="ALUMNE" data-atts="DNI*,Nom,Cognoms" data-aria="Entidad ALUMNE con DNI subrayado, Nom y Cognoms"></div>
+      <figcaption>Esta entidad se convierte en la tabla de abajo (RelationalModel, p. 17).</figcaption>
+    </figure>
+    <pre class="schema"><span class="t">STUDENT</span> (<u>DNI</u>, Name, Surname)</pre>
+    <h4>Cómo se escribe una tabla con FK</h4>
+    <pre class="schema"><span class="t">TABLA</span> (<u>ClavePrimaria</u>, Atributo, Atributo, <span class="fk">ClaveForanea</span> <span class="c">(NOT NULL)</span>)
+  <span class="k">WHERE</span> {ClaveForanea} <span class="k">REFERENCES</span> OTRATABLA</pre>
+    <div class="schema-legend">
+      <span><u>subrayado</u> = clave primaria</span>
+      <span style="color:var(--map)"><b>naranja</b> = clave foránea</span>
+      <span style="color:var(--warn)"><b>rojo</b> = restricción</span>
+      <span><b>WHERE … REFERENCES</b> = a qué tabla apunta la FK</span>
+    </div>
+  </article>
+
+  <article class="sub" id="paso-arbol">
+    <div class="sub-head"><h3><span class="n">3.2</span>¿Qué hago con cada relación?</h3></div>
+    <p class="idea">Hazte estas preguntas en orden. Cada respuesta te lleva a su apartado.</p>
+    <div class="decide" aria-label="Árbol de decisión para pasar relaciones a tablas">
+      <ul class="dtree">
+        <li><span class="dk">¿Une 3 entidades?</span> → <a class="out new" href="#paso-ternaria">Tabla nueva</a> <span class="dn">la PK depende de la cardinalidad (3.6)</span></li>
+        <li><span class="dk">¿Une 2 entidades?</span> → mira la cardinalidad:
+          <ul>
+            <li><span class="dk">N:M</span> → <a class="out new" href="#paso-nm">Tabla nueva</a> <span class="dn">PK = las dos FK juntas (3.3)</span></li>
+            <li><span class="dk">1:N</span> → <a class="out fk" href="#paso-1n">FK en el lado N</a> <span class="dn">NOT NULL si el lado N es obligatorio; si es opcional, también vale tabla nueva (3.4)</span></li>
+            <li><span class="dk">1:1</span> → mira la participación (3.5):
+              <ul>
+                <li><span class="dk">las dos (1,1)</span> → <a class="out join" href="#paso-11">Una sola tabla</a> <span class="dn">si se puede</span></li>
+                <li><span class="dk">las dos (0,1)</span> → <a class="out new" href="#paso-11">Tabla nueva</a> <span class="dn">o FK con UNIQUE</span></li>
+                <li><span class="dk">(1,1) y (0,1)</span> → <a class="out fk" href="#paso-11">FK con UNIQUE</a> <span class="dn">en la tabla que tiene el (0,1)</span></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><span class="dk">¿Es recursiva?</span> → como una binaria, pero la FK apunta a su <b>misma tabla</b> y lleva <b>otro nombre</b> <span class="dn">(3.7)</span></li>
+        <li><span class="dk">¿Es herencia?</span> → <a class="out fk" href="#paso-herencia">Una tabla por clase</a> <span class="dn">cada hijo lleva la PK del padre como PK y FK (3.8)</span></li>
+      </ul>
+    </div>
+  </article>
+
+  <article class="sub" id="paso-nm">
+    <div class="sub-head"><h3><span class="n">3.3</span>Relación N:M → siempre tabla nueva</h3></div>
+    <p class="idea">Se crea una tabla para la relación. Su PK son las PK de las dos entidades.</p>
+    <ul class="clean">
+      <li>Esas dos columnas son además <b>FK</b> hacia sus tablas.</li>
+      <li>Los atributos de la relación (si tiene) van a la tabla nueva.</li>
+    </ul>
+    <figure class="fig">
+      <div data-k="bin" data-a="STUDENT" data-rel="Enroll" data-b="COURSE" data-top="N:M" data-attr="date" data-aria="STUDENT N:M COURSE mediante Enroll, con el atributo date"></div>
+      <figcaption>From ERD to Relational Model, p. 6.</figcaption>
+    </figure>
+    <pre class="schema"><span class="t">STUDENT</span> (<u>student_id</u>, name)
+<span class="t">COURSE</span> (<u>course_id</u>, title)
+<span class="t">ENROLLMENT</span> (<u><span class="fk">student_id</span></u> (FK), <u><span class="fk">course_id</span></u> (FK), enrollment_date)</pre>
+    <p>Otro ejemplo (RelationalModel, p. 21): un alumno practica deportes, con el día de la semana.</p>
+    <pre class="schema"><span class="t">STUDENT</span> (<u>DNI</u>, Name, Surname)
+<span class="t">SPORT</span> (<u>Code</u>, Description)
+<span class="t">PRACTICE</span> (<u><span class="fk">DNIAlumne</span></u>, <u><span class="fk">CodeSport</span></u>, DiaSemanal)
+  <span class="k">WHERE</span> {DNIAlumne} <span class="k">REFERENCES</span> STUDENT <span class="k">and</span> {CodeSport} <span class="k">REFERENCES</span> SPORT</pre>
+  </article>
+
+  <article class="sub" id="paso-1n">
+    <div class="sub-head"><h3><span class="n">3.4</span>Relación 1:N → la clave viaja al lado N</h3></div>
+    <p class="idea">La PK del lado 1 se copia como FK en la tabla del lado N (el de «muchos»).</p>
+    <p>Esto se llama <b>propagar la clave</b> y es lo normal. Si la relación tiene atributos, también se pasan ahí.</p>
+    <ul class="clean">
+      <li>Lado N <b>obligatorio</b> → la FK lleva <b>NOT NULL</b>.</li>
+      <li>Lado N <b>opcional</b> → la FK puede ser NULL. Alternativa: <b>tabla nueva</b> cuya PK es la PK del lado N, para no tener NULL en ninguna FK.</li>
+    </ul>
+    <div class="opt">
+      <p class="opt-label">Ejemplo 1 · lado N obligatorio</p>
+      <figure class="fig">
+        <div data-k="bin" data-a="DEPARTMENT" data-rel="Has" data-b="EMPLOYEE" data-la="(1,1)" data-lb="(0,N)" data-top="1:N" data-aria="DEPARTMENT (1,1) Has (0,N) EMPLOYEE"></div>
+        <figcaption>Cada empleado <b>tiene que</b> estar en un departamento. Un departamento puede tener 0 o más empleados (From ERD, p. 8).</figcaption>
+      </figure>
+      <pre class="schema"><span class="t">DEPARTMENT</span> (<u>DepartmentID</u>, Name)
+<span class="t">EMPLOYEE</span> (<u>EmployeeID</u>, Name, <span class="fk">DepartmentID</span> <span class="c">(NOT NULL)</span>)
+  → {DepartmentID} <span class="k">REFERENCES</span> DEPARTMENT</pre>
+    </div>
+    <div class="opt">
+      <p class="opt-label">Ejemplo 2 · lado N opcional</p>
+      <figure class="fig">
+        <div data-k="bin" data-a="DEPARTMENT" data-rel="Has" data-b="EMPLOYEE" data-la="(0,1)" data-lb="(1,N)" data-top="1:N" data-aria="DEPARTMENT (0,1) Has (1,N) EMPLOYEE"></div>
+        <figcaption>Cada departamento tiene al menos un empleado. Un empleado puede estar en 0 o 1 departamentos (From ERD, p. 9-10).</figcaption>
+      </figure>
+      <pre class="schema"><span class="k">— Opción A · propagar la clave (la FK puede ser NULL) —</span>
+<span class="t">DEPARTMENT</span> (<u>DepartmentID</u>, Name)
+<span class="t">EMPLOYEE</span> (<u>EmployeeID</u>, Name, <span class="fk">DepartmentID</span>) → {DepartmentID} <span class="k">REFERENCES</span> DEPARTMENT
+
+<span class="k">— Opción B · tabla nueva HAS (sin NULL) —</span>
+<span class="t">DEPARTMENT</span> (<u>DepartmentID</u>, Name)
+<span class="t">EMPLOYEE</span> (<u>EmployeeID</u>, Name)
+<span class="t">HAS</span> (<u><span class="fk">EmployeeID</span></u>, <span class="fk">DepartmentID</span>)
+  → {EmployeeID} <span class="k">REFERENCES</span> EMPLOYEE
+  → {DepartmentID} <span class="k">REFERENCES</span> DEPARTMENT</pre>
+      <p class="muted small">En HAS la PK es EmployeeID, porque cada empleado está como mucho en un departamento.</p>
+    </div>
+    <p class="small">Mismo caso en RelationalModel (p. 20): <code>PROFESSOR (DNI, Name, Surname, DepartmentCode) WHERE {DepartmentCode} REFERENCES DEPARTMENT</code>. Ahí avisa de que DepartmentCode puede contener NULL.</p>
+  </article>
+
+  <article class="sub" id="paso-11">
+    <div class="sub-head"><h3><span class="n">3.5</span>Relación 1:1 → depende de la participación</h3></div>
+    <p class="idea">Mira si cada lado es obligatorio (1,1) u opcional (0,1). Hay tres casos.</p>
+    <div class="grid2">
+      <div class="card"><h4>Las dos obligatorias · (1,1) y (1,1)</h4><p><b>Juntar</b> las dos entidades en una sola tabla (si se puede).</p></div>
+      <div class="card"><h4>Las dos opcionales · (0,1) y (0,1)</h4><p><b>Tabla nueva</b> para la relación, sobre todo si tiene atributos. Alternativa: propagar la clave con UNIQUE.</p></div>
+      <div class="card"><h4>Una obligatoria y otra opcional</h4><p><b>Propagar la clave</b>: la PK de la entidad marcada (1,1) va como FK a la tabla de la entidad marcada (0,1). La FK lleva <b>UNIQUE</b> para que siga siendo 1:1.</p></div>
+    </div>
+    <figure class="fig">
+      <div data-k="bin" data-a="PROFESSOR" data-rel="Coordina" data-b="DEPARTMENT" data-la="(1,1)" data-lb="(0,1)" data-top="1:1" data-aria="PROFESSOR (1,1) Coordina (0,1) DEPARTMENT"></div>
+      <figcaption>Cada departamento <b>tiene que</b> tener un profesor coordinador; un profesor coordina como mucho un departamento (RelationalModel, p. 19).</figcaption>
+    </figure>
+    <pre class="schema"><span class="t">PROFESSOR</span> (<u>DNI</u>, Name, Surname)
+<span class="t">DEPARTMENT</span> (<u>Code</u>, Description, <span class="fk">DNIProfessor</span> <span class="c">(NOT NULL)</span>)
+  <span class="k">WHERE</span> {DNIProfessor} <span class="k">REFERENCES</span> PROFESSOR</pre>
+    <div class="tip"><strong>Truco</strong><p>Busca en el dibujo dónde está el <b>(0,1)</b>: esa tabla recibe la FK (aquí, DEPARTMENT). Como todo departamento tiene coordinador, la FK nunca está vacía: <b>NOT NULL</b> (así lo pone RelationalModel). Como un profesor coordina uno como mucho, no se repite: <b>UNIQUE</b> (así lo pone From ERD).</p></div>
+    <p class="muted small">RelationalModel lo simplifica: si las dos son opcionales o las dos obligatorias, la FK puede ir en cualquiera de las dos tablas. Ej.: <code>PROFESSOR (DNI, Name, Surname, DepartmentCode) WHERE {DepartmentCode} REFERENCES DEPARTMENT</code>.</p>
+  </article>
+
+  <article class="sub" id="paso-ternaria">
+    <div class="sub-head"><h3><span class="n">3.6</span>Relación ternaria → siempre tabla nueva</h3></div>
+    <p class="idea">Tabla nueva con las PK de las tres entidades como FK. La PK incluye las FK de los lados N.</p>
+    <p>Los atributos de la relación también van a la tabla nueva.</p>
+    <figure class="fig">
+      <div data-k="ter" data-a="ALUMNE" data-rel="Practica" data-b="ESPORT" data-c="CURS" data-la="(0,n)" data-lb="(0,n)" data-lc="(0,n)" data-top="M:N:P" data-attr="DiaSemanal" data-aria="Ternaria M:N:P: ALUMNE, ESPORT y CURS en Practica, con DiaSemanal"></div>
+      <figcaption>Caso M:N:P de RelationalModel (p. 23). En los otros casos cambian las etiquetas: un (0,1) marca un lado «1».</figcaption>
+    </figure>
+    <div class="tscroll">
+      <table>
+        <caption>¿Qué forma la PK de la tabla nueva? (RelationalModel, p. 23-26)</caption>
+        <thead><tr><th>Caso</th><th>La PK son…</th></tr></thead>
+        <tbody>
+          <tr><td><code>M:N:P</code></td><td>Las <b>3</b> FK.</td></tr>
+          <tr><td><code>1:M:N</code></td><td>Las <b>2</b> FK de los lados N.</td></tr>
+          <tr><td><code>1:1:N</code></td><td>La FK del lado N + la de <b>uno</b> de los lados 1 (cualquiera).</td></tr>
+          <tr><td><code>1:1:1</code></td><td><b>Dos</b> FK cualesquiera.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre class="schema"><span class="t">STUDENT</span> (<u>DNI</u>, Name, Surname)
+<span class="t">SPORT</span> (<u>Code</u>, Description)
+<span class="t">COURSE</span> (<u>Code</u>)
+
+<span class="k">— M:N:P —</span>
+<span class="t">PRACTICE</span> (<u><span class="fk">DNIAlumne</span></u>, <u><span class="fk">CodiEsport</span></u>, <u><span class="fk">CodiCurs</span></u>, DiaSemanal)
+
+<span class="k">— 1:M:N (ESPORT es el lado 1) —</span>
+<span class="t">PRACTICE</span> (<u><span class="fk">DNIAlumne</span></u>, <span class="fk">CodiSport</span>, <u><span class="fk">CodiCurs</span></u>, DiaSemanal)
+
+<span class="k">— 1:1:N (CURS es el lado N) —</span>
+<span class="t">Coordination</span> (<u><span class="fk">CodiCurs</span></u>, <u><span class="fk">DNIAlumne</span></u>, <span class="fk">CodiEsport</span>, DiaSemanal)
+<span class="k">o</span> <span class="t">Coordination</span> (<u><span class="fk">CodiCurs</span></u>, <span class="fk">DNIAlumne</span>, <u><span class="fk">CodiEsport</span></u>, DiaSemanal)
+
+<span class="k">En todas:</span>
+  <span class="k">WHERE</span> {DNIAlumne} <span class="k">REFERENCES</span> STUDENT <span class="k">and</span> {CodiEsport} <span class="k">REFERENCES</span> SPORT <span class="k">and</span> {CodiCurs} <span class="k">REFERENCES</span> CURS</pre>
+    <div class="ojo"><strong>Ojo: los PDF no dicen lo mismo aquí</strong>
+      <ul>
+        <li><b>RelationalModel</b> (p. 25-26, con ejemplos): 1:1:N → lado N + uno de los lados 1. 1:1:1 → dos cualesquiera.</li>
+        <li><b>From ERD</b> (p. 13): 1:1:N → <i>solo</i> la FK del lado N. 1:1:1 → <i>una</i> FK cualquiera.</li>
+        <li>La <b>tabla resumen</b> (ERD to Relational TABLE, y p. 24 de From ERD) tiene las filas ternarias <b>al revés</b>: pone «todas las FK» en 1:1:1 y «cualquiera» en N:N:N.</li>
+      </ul>
+      <p>En M:N:P y 1:M:N coinciden todos. Para 1:1:N y 1:1:1, <b>pregunta al profe</b>. Si no puedes, usa la de RelationalModel: viene con ejemplos resueltos, la explica igual el vídeo de ternarias (4.3), y con solo CodiCurs como PK cada curso solo podría salir en una fila.</p>
+    </div>
+  </article>
+
+  <article class="sub" id="paso-recursiva">
+    <div class="sub-head"><h3><span class="n">3.7</span>Relación recursiva → la FK apunta a su misma tabla</h3></div>
+    <p class="idea">Se trata como una binaria de la entidad consigo misma. La FK apunta a la PK de su propia tabla y lleva otro nombre.</p>
+    <p>Lleva otro nombre porque en una tabla no puede haber dos atributos que se llamen igual (DNI y <b>DNIDelegate</b>). Lo normal es la FK; la tabla nueva solo vale cuando es opcional.</p>
+
+    <div class="opt">
+      <p class="opt-label">1:N · FK a la misma tabla</p>
+      <ul class="clean">
+        <li>Lo normal: una FK que apunta a la PK de la misma tabla. <b>NOT NULL</b> si el lado N es obligatorio.</li>
+        <li>Alternativa <b>solo si es opcional</b>: tabla nueva con 2 FK; su PK es la FK del lado N.</li>
+      </ul>
+      <figure class="fig">
+        <div data-k="rec" data-e="EMPLOYEE" data-rel="Manages" data-l1="(0,N)" data-l2="(0,1)" data-top="1:N" data-aria="EMPLOYEE Manages EMPLOYEE, 1:N"></div>
+        <figcaption>Un empleado puede dirigir a cero o muchos; cada empleado tiene como mucho un jefe. Participación opcional (From ERD, p. 18).</figcaption>
+      </figure>
+      <pre class="schema"><span class="k">— Opción A · FK a la misma tabla —</span>
+<span class="t">EMPLOYEE</span> (<u>CodEmpl</u>, Name, Telephone, <span class="fk">CodManager</span>)
+  <span class="k">WHERE</span> {CodManager} <span class="k">REFERENCES</span> EMPLOYEE
+
+<span class="k">— Opción B · tabla nueva —</span>
+<span class="t">EMPLOYEE</span> (<u>CodEmpl</u>, Name, Telephone)
+<span class="t">MANAGES</span> (<u><span class="fk">CodEmpl</span></u>, <span class="fk">CodManager</span>)
+  <span class="k">WHERE</span> {CodEmpl} <span class="k">REFERENCES</span> EMPLOYEE <span class="k">and</span> {CodManager} <span class="k">REFERENCES</span> EMPLOYEE</pre>
+      <p class="small">Mismo caso en RelationalModel (p. 27): <code>STUDENT (DNI, Name, Surname, DNIDelegate) WHERE {DNIDelegate} REFERENCES STUDENT</code>.</p>
+    </div>
+
+    <div class="opt">
+      <p class="opt-label">1:1 · FK a la misma tabla con UNIQUE</p>
+      <ul class="clean">
+        <li>Lo normal: FK a la misma tabla con <b>UNIQUE</b> (cada uno se une como mucho a otro) y <b>NOT NULL</b> si es obligatoria.</li>
+        <li>Alternativa <b>solo si es opcional</b>: tabla nueva con 2 FK, cada una con UNIQUE. Las dos juntas pueden ser la PK.</li>
+      </ul>
+      <figure class="fig">
+        <div data-k="rec" data-e="PERSON" data-rel="Married" data-l1="(0,1)" data-l2="(0,1)" data-top="1:1" data-aria="PERSON Married PERSON, 1:1 opcional"></div>
+        <figcaption>Una persona puede estar casada con como mucho otra persona; es opcional para las dos (From ERD, p. 20).</figcaption>
+      </figure>
+      <pre class="schema"><span class="k">— Opción A · FK a la misma tabla —</span>
+<span class="t">PERSON</span> (<u>DNI</u>, Name, Telephone, <span class="fk">DNIPartner</span> <span class="c">(UNIQUE)</span>)
+  <span class="k">WHERE</span> {DNIPartner} <span class="k">REFERENCES</span> PERSON
+
+<span class="k">— Opción B · tabla nueva —</span>
+<span class="t">PERSON</span> (<u>DNI</u>, Name, Telephone)
+<span class="t">MARRIED</span> (<u><span class="fk">DNI</span></u> <span class="c">(UNIQUE)</span>, <u><span class="fk">DNIPartner</span></u> <span class="c">(UNIQUE)</span>)
+  <span class="k">WHERE</span> {DNI} <span class="k">REFERENCES</span> PERSON <span class="k">and</span> {DNIPartner} <span class="k">REFERENCES</span> PERSON</pre>
+      <figure class="fig">
+        <div data-k="rec" data-e="COUNTRY" data-rel="SharesBorder" data-l1="(1,1)" data-l2="(1,1)" data-top="1:1" data-aria="COUNTRY SharesBorder COUNTRY, 1:1 obligatoria"></div>
+        <figcaption>Cada país comparte frontera con exactamente otro país: participación <b>obligatoria</b> (From ERD, p. 21).</figcaption>
+      </figure>
+      <pre class="schema"><span class="t">COUNTRY</span> (<u>IDCountry</u>, Name, <span class="fk">IDNeighbour</span> <span class="c">(NOT NULL, UNIQUE)</span>)
+  <span class="k">WHERE</span> {IDNeighbour} <span class="k">REFERENCES</span> COUNTRY</pre>
+      <p class="muted small">En el PDF, la opción con tabla nueva (BORDER) sale <b>tachada</b>: una tabla nueva no garantiza que todos los países participen. Por eso, cuando es obligatoria, se usa la FK.</p>
+    </div>
+
+    <div class="opt">
+      <p class="opt-label">N:M · siempre tabla nueva con 2 FK</p>
+      <figure class="fig">
+        <div data-k="rec" data-e="PIECE" data-rel="Makes" data-l1="(1,N)" data-l2="(1,M)" data-top="N:M" data-aria="PIECE se relaciona consigo misma con Makes, N:M"></div>
+        <figcaption>Una pieza está hecha de muchas piezas, que a su vez están hechas de otras piezas (From ERD, p. 15).</figcaption>
+      </figure>
+      <pre class="schema"><span class="t">PIECE</span> (<u>CodPiece</u>, Description, Size, Color)
+<span class="t">MAKES</span> (<u><span class="fk">CodPiece</span></u>, <u><span class="fk">CodPiece_Makes</span></u>)
+  <span class="k">WHERE</span> {CodPiece} <span class="k">REFERENCES</span> PIECE <span class="k">and</span> {CodPiece_Makes} <span class="k">REFERENCES</span> PIECE</pre>
+      <p>Otro ejemplo (RelationalModel, p. 28): asignaturas que son prerrequisito de otras.</p>
+      <pre class="schema"><span class="t">ASSIGNATURA</span> (<u>Code</u>, Description)
+<span class="t">PREREQUISITE</span> (<u><span class="fk">IDAssignatura</span></u>, <u><span class="fk">IDAssignaturaRequerida</span></u>)
+  <span class="k">WHERE</span> {IDAssignatura} <span class="k">REFERENCES</span> ASSIGNATURA <span class="k">and</span> {IDAssignaturaRequerida} <span class="k">REFERENCES</span> ASSIGNATURA</pre>
+    </div>
+  </article>
+
+  <article class="sub" id="paso-herencia">
+    <div class="sub-head"><h3><span class="n">3.8</span>Herencia → una tabla por clase</h3></div>
+    <p class="idea">Una tabla para el padre y una para cada hijo. La PK del padre pasa a cada hijo como PK y FK a la vez.</p>
+    <p>Funciona así porque la herencia se ve como varias relaciones <b>1:1</b>: el padre es el lado obligatorio (1,1) y cada hijo el opcional (0,1). Por eso se propaga la clave, y el padre guarda los atributos comunes.</p>
+    <figure class="fig">
+      <div data-k="inh" data-p="BUILDING" data-ch="SCHOOL,HOUSE,HOTEL" data-aria="BUILDING es el padre de SCHOOL, HOUSE y HOTEL"></div>
+      <figcaption>From ERD, p. 22-23.</figcaption>
+    </figure>
+    <pre class="schema"><span class="t">BUILDING</span> (<u>IDBuilding</u>)
+<span class="t">SCHOOL</span> (<u><span class="fk">IDBuilding</span></u>) → {IDBuilding} <span class="k">REFERENCES</span> BUILDING
+<span class="t">HOUSE</span> (<u><span class="fk">IDBuilding</span></u>) → {IDBuilding} <span class="k">REFERENCES</span> BUILDING
+<span class="t">HOTEL</span> (<u><span class="fk">IDBuilding</span></u>) → {IDBuilding} <span class="k">REFERENCES</span> BUILDING</pre>
+    <p>Ejemplo con dos niveles (RelationalModel, p. 29): los hijos de PROFESSOR apuntan a PROFESSOR, no a PERSON.</p>
+    <pre class="schema"><span class="t">PERSON</span> (<u>DNI</u>, Name, Surname, Telephone)
+<span class="t">PROFESSOR</span> (<u><span class="fk">DNI</span></u>, Salary) <span class="k">WHERE</span> {DNI} <span class="k">REFERENCES</span> PERSON
+<span class="t">STUDENT</span> (<u><span class="fk">DNI</span></u>) <span class="k">WHERE</span> {DNI} <span class="k">REFERENCES</span> PERSON
+<span class="t">COMPUTERSCIENTIST</span> (<u><span class="fk">DNI</span></u>, SoftwareSpecialty, HardwareSpecialty) <span class="k">WHERE</span> {DNI} <span class="k">REFERENCES</span> PROFESSOR
+<span class="t">ADMINISTRATIVE</span> (<u><span class="fk">DNI</span></u>, Degree, Specialty) <span class="k">WHERE</span> {DNI} <span class="k">REFERENCES</span> PROFESSOR</pre>
+  </article>
+
+  <article class="sub" id="resumen">
+    <div class="sub-head"><h3><span class="n">3.9</span>Tabla resumen de todos los casos</h3><p class="src">PDF: ERD to Relational TABLE · From ERD to Relational Model (p. 24)</p></div>
+    <p>«Propagar la clave» = poner la PK de una tabla como FK en otra. «Tabla nueva» = crear una tabla solo para la relación.</p>
+    <div class="tscroll">
+      <table class="sum">
+        <thead><tr><th>Grado</th><th>Card.</th><th>Qué se hace</th></tr></thead>
+        <tbody>
+          <tr class="grp"><th scope="row" rowspan="3">Recursiva<br><span class="muted" style="font-weight:400;font-size:.85rem">(unaria)</span></th><td class="cc">1:1</td><td>Las dos obligatorias: FK a la misma tabla (NOT NULL y UNIQUE).<br>Las dos opcionales: FK a la misma tabla (UNIQUE). Alternativa: tabla nueva para evitar FK nulas (UNIQUE).<br>Una y una: FK a la misma tabla (UNIQUE).</td></tr>
+          <tr><td class="cc">1:N</td><td>Lado N obligatorio: FK a la misma tabla (NOT NULL).<br>Lado N opcional: FK a la misma tabla. Alternativa: tabla nueva para evitar FK nulas.</td></tr>
+          <tr><td class="cc">N:N</td><td>Tabla nueva con dos FK a la PK de la entidad. Las dos juntas forman la PK.</td></tr>
+          <tr class="grp"><th scope="row" rowspan="3">Binaria</th><td class="cc">1:1</td><td>Las dos obligatorias: juntar en una sola tabla si se puede.<br>Las dos opcionales: tabla nueva. Alternativa: FK con UNIQUE.<br>Una obligatoria y otra opcional: FK en la entidad opcional (UNIQUE).</td></tr>
+          <tr><td class="cc">1:N</td><td>Lado N obligatorio: FK en el lado N (NOT NULL).<br>Lado N opcional: FK en el lado N. Alternativa: tabla nueva para evitar FK nulas.</td></tr>
+          <tr><td class="cc">N:N</td><td>Tabla nueva con dos FK, una a cada entidad. Juntas forman la PK compuesta.</td></tr>
+          <tr class="grp"><th scope="row" rowspan="4">Ternaria</th><td class="cc">1:1:1</td><td>Tabla nueva. PK: dos FK cualesquiera.<span class="warnline">La tabla del PDF pone aquí «todas las FK» ⚠</span></td></tr>
+          <tr><td class="cc">1:1:N</td><td>Tabla nueva. PK: FK del lado N + una de los lados 1.<span class="warnline">La tabla del PDF pone «las FK de los dos lados N» ⚠</span></td></tr>
+          <tr><td class="cc">1:N:N</td><td>Tabla nueva. PK: las FK de los dos lados N.<span class="warnline">La tabla del PDF pone «solo la FK del lado N» ⚠</span></td></tr>
+          <tr><td class="cc">N:N:N</td><td>Tabla nueva. PK: las tres FK.<span class="warnline">La tabla del PDF pone «cualquiera de las FK» ⚠</span></td></tr>
+          <tr class="grp"><th scope="row">Herencia</th><td class="cc">—</td><td>Propagar la clave: la PK del padre pasa a cada hijo como PK y FK. Es el mismo caso que una binaria 1:1 con un lado obligatorio y otro opcional.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">Las filas ternarias siguen las explicaciones con ejemplos de RelationalModel. Lee el aviso de la <a href="#paso-ternaria">sección 3.6</a>.</p>
+  </article>
+</section>
+
+<!-- =================== TEMA 4 =================== -->
+<section id="final" class="topic fn wrap">
+  <header class="topic-head">
+    <span class="bn">4</span>
+    <div>
+      <p class="eyebrow">Antes del examen</p>
+      <h2>Repaso final</h2>
+    </div>
+  </header>
+
+  <article class="sub" id="ojo">
+    <div class="sub-head"><h3><span class="n">4.1</span>Trampas típicas</h3></div>
+    <ul class="clean">
+      <li><b>Grado</b> y <b>cardinalidad</b> cambian de significado: en el ER son «nº de entidades» y «1:1, 1:N, N:M»; en una tabla son «nº de columnas» y «nº de filas».</li>
+      <li><b>1:1</b> no dice si la relación es obligatoria. Eso lo dice <b>(min,max)</b>.</li>
+      <li><b>Mínimo 1</b> (obligatoria) → la FK lleva <b>NOT NULL</b>. <b>Mínimo 0</b> (opcional) → la FK puede ser NULL.</li>
+      <li><b>N:M y ternarias</b>: siempre tabla nueva. <b>1:N</b>: la FK va al lado N, nunca al lado 1.</li>
+      <li>Una <b>tabla nueva</b> evita NULL, pero <b>no garantiza</b> participación obligatoria. Por eso solo es alternativa cuando es opcional.</li>
+      <li>En <b>recursivas</b>, la FK necesita <b>otro nombre</b>: DNIDelegate, CodManager, IDNeighbour, DNIPartner…</li>
+      <li>En <b>herencia</b>, la PK de cada hijo es también FK hacia el padre.</li>
+      <li>En <i>RelationalModel</i>, «relationship» suele querer decir <b>tabla</b>.</li>
+    </ul>
+    <div class="ojo"><strong>Donde los apuntes se contradicen</strong>
+      <ul>
+        <li><b>PK de las ternarias 1:1:N y 1:1:1</b>: RelationalModel, From ERD (p. 13) y la tabla resumen dicen cosas distintas. Ver <a href="#paso-ternaria">3.6</a>.</li>
+        <li><b>Dónde se escribe el (min,max)</b>: el ejemplo Student/Locker de <i>er model</i> se lee al revés que los dibujos de los otros PDF. Ver <a href="#er-participacion">1.6</a>.</li>
+      </ul>
+      <p>Si puedes, pregunta al profe antes del examen cuál quiere.</p>
+    </div>
+  </article>
+
+  <article class="sub" id="repaso">
+    <div class="sub-head"><h3><span class="n">4.2</span>Preguntas de repaso</h3></div>
+    <p class="muted">Piensa la respuesta antes de abrirla. Van en el orden de los temas.</p>
+    <div class="qs">
+      <details class="q"><summary>¿Cuáles son las 3 fases del diseño de una base de datos?<span class="qtag">1.1</span></summary><div><p><b>Conceptual</b> (recoger información y hacer el ER), <b>lógica</b> (pasarlo al modelo relacional) y <b>física</b> (índices, espacio, buffer, ajustes del SGBD).</p></div></details>
+      <details class="q"><summary>¿Con qué figura se dibuja una entidad, un atributo, una relación y una herencia?<span class="qtag">1.1</span></summary><div><p>Entidad: <b>rectángulo</b>. Atributo: <b>óvalo</b> (si es clave, subrayado). Relación: <b>rombo</b>. Herencia: <b>triángulo invertido</b>.</p></div></details>
+      <details class="q"><summary>¿Qué diferencia hay entre un atributo compuesto y uno derivado?<span class="qtag">1.3</span></summary><div><p><b>Compuesto</b>: se divide en partes con sentido propio (Cognoms → Cognoms 1 y Cognoms 2). <b>Derivado</b>: su valor se calcula a partir de otros atributos.</p></div></details>
+      <details class="q"><summary>¿Qué te dice (1,N) que no te dice 1:N?<span class="qtag">1.6</span></summary><div><p>El <b>mínimo</b>: siempre hay al menos uno, así que es <b>obligatoria</b>. 1:N solo da la idea general.</p></div></details>
+      <details class="q"><summary>En el ejemplo Departamento–Empleado, solo hay un empleado sin jefe. ¿Quién es?<span class="qtag">1.10</span></summary><div><p>El <b>CEO</b>: no es subordinado de nadie. Por eso el mínimo del rol subordinado es 0.</p></div></details>
+      <details class="q"><summary>STUDENT (DNI, Name, Surname, Telephone) tiene 3 filas. ¿Grado y cardinalidad?<span class="qtag">2.3</span></summary><div><p>Grado <b>4</b> (columnas). Cardinalidad <b>3</b> (filas).</p></div></details>
+      <details class="q"><summary>¿Qué es el grado de una relación en el ER? ¿Y el grado de una tabla?<span class="qtag">1.4 · 2.3</span></summary><div><p>En el ER: cuántas entidades une (1 recursiva, 2 binaria, 3 ternaria). En una tabla: cuántas columnas tiene.</p></div></details>
+      <details class="q"><summary>¿Qué diferencia hay entre clave candidata, primaria, alternativa y foránea?<span class="qtag">2.4</span></summary><div><p><b>Candidatas</b>: las que podrían identificar cada fila (DNI, NumSS, NumMatricula). <b>Primaria</b>: la que eliges (DNI). <b>Alternativas</b>: las candidatas que no eliges. <b>Foránea</b>: apunta a la PK de otra tabla (o de la misma) para unir filas.</p></div></details>
+      <details class="q"><summary>Borras el aula 201 de CLASSROOM. ¿Qué pasa con CASCADE? ¿Y con RESTRICT?<span class="qtag">2.6</span></summary><div><p><b>CASCADE</b>: se borran también los alumnos del aula 201 (Anna y Xavier). <b>RESTRICT</b>: no te deja borrar el aula mientras haya alumnos en ella.</p></div></details>
+      <details class="q"><summary>¿Qué se hace siempre con una relación N:M y con una ternaria?<span class="qtag">3.3 · 3.6</span></summary><div><p>Una <b>tabla nueva</b>. En la N:M, su PK son las dos FK juntas. En la ternaria, la PK depende de la cardinalidad.</p></div></details>
+      <details class="q"><summary>Relación 1:N con el lado N obligatorio. ¿Dónde va la FK y con qué restricción?<span class="qtag">3.4</span></summary><div><p>En la tabla del <b>lado N</b>, con <b>NOT NULL</b>.</p><pre class="schema"><span class="t">EMPLOYEE</span> (<u>EmployeeID</u>, Name, <span class="fk">DepartmentID</span> <span class="c">(NOT NULL)</span>)</pre></div></details>
+      <details class="q"><summary>¿Por qué en una relación recursiva la FK no puede llamarse igual que la PK?<span class="qtag">3.7</span></summary><div><p>Porque las dos están en la misma tabla, y en una tabla no puede haber dos atributos con el mismo nombre. Por eso: DNI y DNIDelegate.</p></div></details>
+      <details class="q"><summary>Ejercicio: pasa a tablas el ejemplo Departamento–Empleado de la sección 1.10.<span class="qtag">1.10 · 3</span></summary><div>
+        <p class="muted small">Solución aplicando las reglas del tema 3 (el PDF no trae este ejercicio resuelto).</p>
+        <pre class="schema"><span class="t">DEPARTMENT</span> (<u>DeptID</u>, Name, Room)
+<span class="t">EMPLOYEE</span> (<u>EmployeeID</u>, Name, Surname, Salary, HireDate, <span class="fk">DeptID</span> <span class="c">(NOT NULL)</span>, <span class="fk">BossID</span>)
+  <span class="k">WHERE</span> {DeptID} <span class="k">REFERENCES</span> DEPARTMENT <span class="k">and</span> {BossID} <span class="k">REFERENCES</span> EMPLOYEE</pre>
+        <ul class="clean">
+          <li>BelongsTo es 1:N y cada empleado <b>tiene que</b> tener departamento → FK en EMPLOYEE con NOT NULL.</li>
+          <li>Has es recursiva 1:N y opcional (el CEO no tiene jefe) → FK a la misma tabla, con otro nombre (BossID) y sin NOT NULL.</li>
+        </ul>
+      </div></details>
+    </div>
+  </article>
+
+  <article class="sub" id="videos">
+    <div class="sub-head"><h3><span class="n">4.3</span>Vídeos de repaso</h3></div>
+    <p>Ningún vídeo dice exactamente lo mismo que tus apuntes. Leí la transcripción de cada uno y la comparé con los 5 PDF; debajo de cada vídeo tienes en qué coincide y en qué no. <b>Si un vídeo y tus apuntes no coinciden, en el examen haz caso a los apuntes.</b></p>
+    <ul class="vids">
+      <li class="vid">
+        <div class="vid-top"><span class="st tema">Tema 1</span><span class="st ok">Coincide</span><span class="vid-meta">LoboTecnoKu · 3 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=NJp-uJGwg6k" target="_blank" rel="noopener">Modelo Entidad Relación - Tutorial Rápido</a>
+        <p>Entidad (rectángulo), relación (rombo), atributo (elipse), clave primaria y cardinalidad 1:1, 1:N y N:M. Pone el (min,max) al otro lado de la relación, como los dibujos de Cardinality y From ERD.</p>
+        <p class="vid-diff">No trata herencia, ternarias, Crow's foot ni las fases del diseño.</p>
+      </li>
+      <li class="vid">
+        <div class="vid-top"><span class="st tema">Tema 3 · 3.3</span><span class="st ok">Coincide</span><span class="vid-meta">Pepe Lluyot · 8 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=hRLVqibEqY8" target="_blank" rel="noopener">Transformación DER al Modelo Relacional. RELACIÓN N:M. #2</a>
+        <p>Tabla nueva con las claves de las dos entidades como PK y los atributos de la relación.</p>
+        <p class="vid-diff">Extra que no sale en tus PDF: meter la fecha en la PK para guardar un histórico. Él marca la FK con subrayado discontinuo; en el examen usa <code>WHERE {…} REFERENCES …</code>.</p>
+        <a class="vid-jump" href="https://www.youtube.com/watch?v=hRLVqibEqY8&amp;t=467s" target="_blank" rel="noopener">Ir al resumen (7:47)</a>
+      </li>
+      <li class="vid">
+        <div class="vid-top"><span class="st tema">Tema 3 · 3.4</span><span class="st casi">Casi</span><span class="vid-meta">Pepe Lluyot · 9 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=ePOE6TtbFOc" target="_blank" rel="noopener">Transformación DER al Modelo Relacional. RELACIÓN 1:N. #3</a>
+        <p>Si el lado N es obligatorio, la clave del lado 1 pasa como FK al lado N. Igual que tus apuntes.</p>
+        <p class="vid-diff"><b>Diferencia:</b> si el lado N es opcional, él dice que lo normal es hacer tabla nueva. Tus PDF dicen que lo normal es poner la FK (puede quedar NULL) y que la tabla nueva es solo una alternativa.</p>
+        <a class="vid-jump" href="https://www.youtube.com/watch?v=ePOE6TtbFOc&amp;t=461s" target="_blank" rel="noopener">Ir al resumen (7:41)</a>
+      </li>
+      <li class="vid">
+        <div class="vid-top"><span class="st tema">Tema 3 · 3.5</span><span class="st casi">Casi</span><span class="vid-meta">Pepe Lluyot · 11 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=gI4XYxyjCiI" target="_blank" rel="noopener">Transformación DER al Modelo Relacional. RELACIÓN 1:1. #4</a>
+        <p>Una obligatoria y otra opcional: FK en la tabla de la entidad que siempre tiene pareja. Las dos opcionales: tabla nueva con UNIQUE. Igual que tus apuntes.</p>
+        <p class="vid-diff"><b>Diferencia:</b> si las dos son obligatorias, él pone una FK con UNIQUE. From ERD dice juntar las dos entidades en una sola tabla (RelationalModel sí dice lo mismo que él).</p>
+        <a class="vid-jump" href="https://www.youtube.com/watch?v=gI4XYxyjCiI&amp;t=611s" target="_blank" rel="noopener">Ir al resumen (10:11)</a>
+      </li>
+      <li class="vid">
+        <div class="vid-top"><span class="st tema">Tema 3 · 3.6</span><span class="st ok">Coincide</span><span class="vid-meta">Nettorius · 26 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=eBfKilVl_w0" target="_blank" rel="noopener">Paso de ER a MR de las interrelaciones TERNARIAS</a>
+        <p>Mismas reglas de la PK que RelationalModel: M:N:P → las 3 FK; 1:M:N → las 2 FK de los lados N; 1:1:N → la FK del lado N + la de uno de los lados 1; 1:1:1 → dos FK cualesquiera.</p>
+        <p class="vid-diff">La regla la explica en los primeros minutos; el resto es un ejemplo largo de ciclistas.</p>
+      </li>
+      <li class="vid">
+        <div class="vid-top"><span class="st tema">Tema 3 · 3.8</span><span class="st casi">Solo una parte</span><span class="vid-meta">Pepe Lluyot · 22 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=unEfxDluVb0" target="_blank" rel="noopener">Transformación DER al Modelo Relacional. JERARQUÍAS. #5</a>
+        <p>Su <b>tercera opción</b> (una tabla por clase; la PK del hijo es también FK al padre) es la de tus apuntes.</p>
+        <p class="vid-diff">Las otras dos opciones y lo de jerarquía total/parcial y exclusiva/con solapamiento no salen en tus PDF: no hace falta que te lo aprendas.</p>
+        <a class="vid-jump" href="https://www.youtube.com/watch?v=unEfxDluVb0&amp;t=1235s" target="_blank" rel="noopener">Ir al resumen (20:35)</a>
+      </li>
+    </ul>
+    <h4>Mejor no</h4>
+    <ul class="vids">
+      <li class="vid">
+        <div class="vid-top"><span class="st no">Contradice tus apuntes</span><span class="vid-meta">Javi Castillo J. · 8 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=fPu5jsMipak" target="_blank" rel="noopener">Transformación Interrelación Reflexiva</a>
+        <p class="vid-diff">Dice que en las reflexivas lo mejor es <b>siempre</b> tabla nueva. Tus PDF dicen lo contrario: lo preferido es la FK a la misma tabla.</p>
+      </li>
+      <li class="vid">
+        <div class="vid-top"><span class="st casi">Demasiado largo</span><span class="vid-meta">Pepe Lluyot · 42 min</span></div>
+        <a class="vid-title" href="https://www.youtube.com/watch?v=KXznF3Re0QI" target="_blank" rel="noopener">Modelo Entidad Relación. MER.</a>
+        <p class="vid-diff">Es una clase entera e incluye entidades débiles, que no salen en tus PDF. Para repasar es mejor el de 3 minutos.</p>
+      </li>
+    </ul>
+    <div class="tip"><strong>Sin vídeo fiable</strong><p>Para las recursivas en tablas, CASCADE/RESTRICT/SET NULL, triggers y el grado y la cardinalidad de una tabla no encontré ningún vídeo que coincida con tus apuntes. Repásalos aquí: <a href="#paso-recursiva">3.7</a>, <a href="#rel-integridad">2.6</a>, <a href="#rel-triggers">2.7</a> y <a href="#rel-grado">2.3</a>.</p></div>
+  </article>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p>Resumen hecho solo con los 5 PDF de clase: er model, Cardinality, RelationalModel, From ERD to Relational Model y ERD to Relational TABLE. Examen de Bases de Datos del 13-11-2026.</p>
+</footer>
+
+<script>
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function txt(x, y, s, cls, extra) { return '<text class="' + cls + '" x="' + x + '" y="' + y + '"' + (extra || '') + '>' + esc(s) + '</text>'; }
+  function open(w, h, aria) { return '<svg class="chen" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(aria) + '">'; }
+
+  function bin(d) {
+    var h = d.attr ? 128 : 80, s = open(440, h, d.aria);
+    s += '<line class="ln" x1="126" y1="40" x2="176" y2="40"/><line class="ln" x1="264" y1="40" x2="314" y2="40"/>';
+    if (d.attr) s += '<line class="ln" x1="220" y1="64" x2="220" y2="92"/><ellipse class="att" cx="220" cy="107" rx="64" ry="15"/>' + txt(220, 111.5, d.attr, 'att-t');
+    s += '<rect class="ent" x="6" y="20" width="120" height="40"/>' + txt(66, 45, d.a, 'ent-t');
+    s += '<rect class="ent" x="314" y="20" width="120" height="40"/>' + txt(374, 45, d.b, 'ent-t');
+    s += '<polygon class="rel" points="176,40 220,16 264,40 220,64"/>' + txt(220, 44.5, d.rel, 'rel-t');
+    if (d.la) s += txt(131, 33, d.la, 'card-t');
+    if (d.lb) s += txt(309, 33, d.lb, 'card-t end');
+    if (d.top) s += txt(220, 10, d.top, 'top-t');
+    return s + '</svg>';
+  }
+
+  function ter(d) {
+    var s = open(440, 170, d.aria);
+    s += '<line class="ln" x1="126" y1="40" x2="176" y2="40"/><line class="ln" x1="264" y1="40" x2="314" y2="40"/><line class="ln" x1="220" y1="64" x2="220" y2="124"/>';
+    if (d.attr) s += '<line class="ln" x1="244" y1="52" x2="300" y2="92"/><ellipse class="att" cx="350" cy="100" rx="62" ry="15"/>' + txt(350, 104.5, d.attr, 'att-t');
+    s += '<rect class="ent" x="6" y="20" width="120" height="40"/>' + txt(66, 45, d.a, 'ent-t');
+    s += '<rect class="ent" x="314" y="20" width="120" height="40"/>' + txt(374, 45, d.b, 'ent-t');
+    s += '<rect class="ent" x="160" y="124" width="120" height="40"/>' + txt(220, 149, d.c, 'ent-t');
+    s += '<polygon class="rel" points="176,40 220,16 264,40 220,64"/>' + txt(220, 44.5, d.rel, 'rel-t');
+    if (d.la) s += txt(131, 33, d.la, 'card-t');
+    if (d.lb) s += txt(309, 33, d.lb, 'card-t end');
+    if (d.lc) s += txt(228, 112, d.lc, 'card-t');
+    if (d.top) s += txt(220, 10, d.top, 'top-t');
+    return s + '</svg>';
+  }
+
+  function rec(d) {
+    var s = open(440, 108, d.aria);
+    s += '<path class="ln" d="M130 56 V20 H320 V52"/><line class="ln" x1="200" y1="76" x2="270" y2="76"/>';
+    s += '<rect class="ent" x="60" y="56" width="140" height="40"/>' + txt(130, 81, d.e, 'ent-t');
+    s += '<polygon class="rel" points="270,76 320,52 370,76 320,100"/>' + txt(320, 80.5, d.rel, 'rel-t');
+    if (d.l1) s += txt(137, 46, d.l1, 'card-t');
+    if (d.l2) s += txt(206, 69, d.l2, 'card-t');
+    if (d.r1) s += txt(225, 14, d.r1, 'role-t');
+    if (d.r2) s += txt(235, 92, d.r2, 'role-t');
+    if (d.top) s += txt(378, 80, d.top, 'top-t', ' style="text-anchor:start"');
+    return s + '</svg>';
+  }
+
+  function inh(d) {
+    var ch = d.ch.split(','), n = ch.length, w = n === 3 ? 120 : 130;
+    var xs = n === 3 ? [76, 220, 364] : [120, 320];
+    var s = open(440, 150, d.aria);
+    s += '<line class="ln" x1="220" y1="40" x2="220" y2="56"/>';
+    xs.forEach(function (x) { s += '<line class="ln" x1="220" y1="80" x2="' + x + '" y2="110"/>'; });
+    s += '<rect class="ent" x="160" y="4" width="120" height="36"/>' + txt(220, 27, d.p, 'ent-t');
+    s += '<polygon class="tri" points="198,56 242,56 220,80"/>';
+    ch.forEach(function (c, i) { s += '<rect class="ent" x="' + (xs[i] - w / 2) + '" y="110" width="' + w + '" height="36"/>' + txt(xs[i], 133, c, 'ent-t'); });
+    return s + '</svg>';
+  }
+
+  function ent(d) {
+    var atts = d.atts.split(','), n = atts.length, s = open(440, 128, d.aria);
+    var xs = n === 3 ? [100, 220, 340] : [56, 164, 276, 384];
+    atts.forEach(function (a, i) { s += '<line class="ln" x1="' + (190 + i * 30) + '" y1="46" x2="' + xs[i] + '" y2="88"/>'; });
+    s += '<rect class="ent" x="160" y="8" width="120" height="38"/>' + txt(220, 32, d.e, 'ent-t');
+    atts.forEach(function (a, i) {
+      var pk = a.charAt(a.length - 1) === '*', name = pk ? a.slice(0, -1) : a;
+      s += '<ellipse class="att" cx="' + xs[i] + '" cy="104" rx="48" ry="16"/>' + txt(xs[i], 108.5, name, 'att-t' + (pk ? ' pk' : ''));
+    });
+    return s + '</svg>';
+  }
+
+  function sets(d) {
+    var ys = { 1: 30, 2: 58, 3: 86, 4: 30, 5: 58, 6: 86 }, s = open(150, 116, d.aria);
+    s += '<ellipse class="set" cx="38" cy="58" rx="24" ry="50"/><ellipse class="set" cx="112" cy="58" rx="24" ry="50"/>';
+    d.p.split(',').forEach(function (pair) {
+      var ab = pair.split('-');
+      s += '<line class="ln" x1="47" y1="' + ys[ab[0]] + '" x2="103" y2="' + ys[ab[1]] + '"/>';
+    });
+    [1, 2, 3].forEach(function (k) { s += txt(38, ys[k] + 4.5, k, 'set-t'); });
+    [4, 5, 6].forEach(function (k) { s += txt(112, ys[k] + 4.5, k, 'set-t'); });
+    return s + '</svg>';
+  }
+
+  var kinds = { bin: bin, ter: ter, rec: rec, inh: inh, ent: ent, sets: sets };
+  var nodes = document.querySelectorAll('[data-k]');
+  for (var i = 0; i < nodes.length; i++) {
+    var k = nodes[i].getAttribute('data-k');
+    if (kinds[k]) { try { nodes[i].innerHTML = kinds[k](nodes[i].dataset); } catch (e) { /* deja el hueco vacío si algo falla */ } }
+  }
+})();
+</script>
+
+</html>
